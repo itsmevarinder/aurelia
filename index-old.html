@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AURELIA — L'Élixir Nocturne · Extrait de Parfum</title>
+<meta name="description" content="AURELIA L'Élixir Nocturne — an extrait de parfum crafted in shadow, worn in light.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+:root{
+  --bg:#070709;
+  --ivory:#F5F2EB;
+  --gold:#D4AF37;
+  --gold-deep:#B8860B;
+  --line:rgba(255,255,255,0.1);
+  --muted:rgba(245,242,235,0.62);
+  --faint:rgba(245,242,235,0.4);
+  --glass:rgba(18,17,16,0.38);
+  --serif:'Cormorant Garamond', 'Times New Roman', serif;
+  --sans:'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --ease:cubic-bezier(.7,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+html{background:var(--bg)}
+body{
+  background:var(--bg);color:var(--ivory);font-family:var(--sans);font-weight:400;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;
+}
+body.is-loading{overflow:hidden;height:100vh}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--gold);color:var(--bg)}
+:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+
+/* ---------- WebGL + atmosphere ---------- */
+#webgl{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:block}
+.vignette{
+  position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(0,0,0,.62) 100%);
+}
+.grain{
+  position:fixed;inset:-50%;z-index:3;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation:grain 1.2s steps(6) infinite;
+}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+
+/* ---------- Preloader ---------- */
+#preloader{
+  position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+}
+.pl-inner{width:min(420px,80vw);display:flex;flex-direction:column;align-items:center;gap:22px}
+.pl-brand{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,52px);letter-spacing:.5em;margin-right:-.5em}
+.pl-sub{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--muted);letter-spacing:.04em}
+.pl-bar{width:100%;height:1px;background:var(--line);position:relative;overflow:hidden}
+.pl-bar i{position:absolute;inset:0;background:linear-gradient(90deg,var(--gold-deep),var(--gold),#f3dc8a);transform:scaleX(0);transform-origin:left center}
+.pl-meta{width:100%;display:flex;justify-content:space-between;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--faint)}
+.pl-meta b{font-weight:500;color:var(--gold);font-variant-numeric:tabular-nums}
+
+/* ---------- Nav ---------- */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:26px 4vw;transition:background .6s ease, padding .6s ease, border-color .6s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.scrolled{
+  padding:16px 4vw;background:rgba(7,7,9,.55);border-bottom-color:var(--line);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+}
+.logo{font-family:var(--serif);font-size:24px;font-weight:500;letter-spacing:.42em;display:flex;align-items:center;gap:14px}
+.logo-mark{width:9px;height:9px;border:1px solid var(--gold);transform:rotate(45deg)}
+.nav-links{display:flex;gap:42px;list-style:none}
+.nav-links a{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);position:relative;padding:6px 0;transition:color .4s}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .6s var(--ease)}
+.nav-links a:hover{color:var(--ivory)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.cart-btn{
+  display:flex;align-items:center;gap:10px;padding:11px 18px 11px 16px;min-height:44px;
+  border:1px solid var(--line);border-radius:999px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  transition:border-color .4s, background .4s;
+}
+.cart-btn:hover{border-color:rgba(212,175,55,.6);background:rgba(212,175,55,.06)}
+.cart-btn svg{width:16px;height:16px}
+.badge{
+  min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--gold);color:var(--bg);
+  font-size:10px;font-weight:600;letter-spacing:0;display:inline-flex;align-items:center;justify-content:center;
+}
+
+/* ---------- Shared ---------- */
+main{position:relative;z-index:10}
+section{position:relative;z-index:10}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:14px;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);
+}
+.eyebrow::before{content:"";width:34px;height:1px;background:currentColor;opacity:.7}
+.sec-title{font-family:var(--serif);font-weight:300;font-size:clamp(38px,4.6vw,74px);line-height:1.02;letter-spacing:-.005em;margin:22px 0 18px}
+.sec-title em{font-style:italic;color:var(--gold)}
+.sec-lead{color:var(--muted);font-size:15px;line-height:1.75;max-width:460px;font-weight:300}
+.frost{
+  background:var(--glass);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(16px) saturate(120%);backdrop-filter:blur(16px) saturate(120%);
+}
+
+/* ---------- Hero ---------- */
+.hero{height:100vh;min-height:620px}
+.hero-inner{position:absolute;inset:0;padding:0 4vw}
+.hero .eyebrow{position:absolute;top:calc(84px + 7vh);left:4vw}
+.hl{
+  font-family:var(--serif);font-weight:300;font-size:clamp(44px,5.7vw,118px);line-height:.94;letter-spacing:-.01em;
+  position:absolute;text-transform:uppercase;
+}
+.hl .line{display:block;overflow:hidden;padding-bottom:.06em}
+.hl .word{display:inline-block;will-change:transform ; font-weight: 600;}
+.hl-1{top:27vh;left:4vw}
+.hl-2{bottom:24vh;right:4vw;text-align:right}
+.hl-2 em{font-style:italic;color:var(--gold);text-transform:none;font-weight:300}
+.hero-foot{
+  position:absolute;left:4vw;right:4vw;bottom:5.5vh;display:flex;justify-content:space-between;align-items:flex-end;gap:30px;
+}
+.hero-copy{max-width:330px;font-size:13.5px;line-height:1.75;color:var(--muted);font-weight:300}
+.cta{
+  display:inline-flex;align-items:center;gap:16px;margin-top:22px;padding:16px 26px;min-height:48px;
+  border:1px solid rgba(212,175,55,.55);border-radius:999px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ivory);
+  position:relative;overflow:hidden;transition:color .5s var(--ease), border-color .5s;
+}
+.cta::before{content:"";position:absolute;inset:0;background:var(--gold);transform:translateY(101%);transition:transform .6s var(--ease);z-index:-1}
+.cta:hover{color:var(--bg);border-color:var(--gold)}
+.cta:hover::before{transform:translateY(0)}
+.cta svg{width:14px;height:14px;transition:transform .6s var(--ease)}
+.cta:hover svg{transform:translateY(3px)}
+.scroll-hint{display:flex;flex-direction:column;align-items:center;gap:12px;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--faint)}
+.scroll-hint i{width:1px;height:54px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
+.scroll-hint i::after{content:"";position:absolute;left:0;top:-30%;width:1px;height:30%;background:var(--ivory);animation:drip 2.2s var(--ease) infinite}
+@keyframes drip{to{top:110%}}
+.hero-meta{text-align:right;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);line-height:2}
+.hero-meta b{color:var(--ivory);font-weight:500}
+
+/* ---------- Notes ---------- */
+.notes{min-height:120vh;padding:20vh 4vw 14vh}
+.notes-grid{display:grid;grid-template-columns:minmax(0,560px) 1fr;gap:4vw}
+.notes-cards{display:flex;flex-direction:column;gap:16px;margin-top:42px}
+.note-card{
+  border-radius:18px;padding:26px 28px;display:grid;grid-template-columns:52px 1fr auto;gap:20px;align-items:start;
+  transition:border-color .5s, background .5s, translate .6s var(--ease);cursor:default;
+}
+.note-card:hover{border-color:rgba(212,175,55,.42);background:rgba(28,24,18,.48);translate:8px 0}
+.note-idx{font-family:var(--serif);font-size:34px;font-style:italic;color:var(--gold);line-height:1}
+.note-tier{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.note-name{font-family:var(--serif);font-size:clamp(24px,2vw,30px);font-weight:400;line-height:1.15}
+.note-desc{margin-top:10px;font-size:13px;line-height:1.7;color:var(--muted);font-weight:300}
+.note-time{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);white-space:nowrap;padding-top:4px}
+.note-swatch{display:block;width:10px;height:10px;border-radius:50%;margin:14px 0 0 2px;box-shadow:0 0 14px currentColor}
+
+/* ---------- Craft ---------- */
+.craft{height:130vh}
+.craft-sticky{
+  position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;
+  padding:calc(92px + 5vh) 4vw 7vh;text-align:center;pointer-events:none;
+}
+.craft-sticky .sec-title{margin-bottom:0}
+.craft-facts{display:flex;gap:min(7vw,90px);justify-content:center;flex-wrap:wrap}
+.fact{text-align:center}
+.fact b{display:block;font-family:var(--serif);font-weight:300;font-size:clamp(30px,3vw,44px);color:var(--ivory)}
+.fact span{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint)}
+
+/* callouts (fixed overlay, projected from 3D anchors) */
+#callouts{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0}
+#callouts svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#callouts polyline{fill:none;stroke:rgba(212,175,55,.75);stroke-width:1}
+#callouts .dot{fill:var(--gold)}
+#callouts .ring{fill:none;stroke:var(--gold);stroke-width:1;transform-box:fill-box;transform-origin:center;animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(2.4);opacity:0}}
+.callout{
+  position:absolute;left:0;top:0;width:min(250px,42vw);padding:16px 18px;border-radius:14px;will-change:transform;
+}
+.callout .num{font-size:10px;letter-spacing:.3em;color:var(--gold)}
+.callout h3{font-family:var(--serif);font-weight:500;font-size:21px;line-height:1.15;margin:6px 0 6px}
+.callout p{font-size:12px;line-height:1.6;color:var(--muted);font-weight:300}
+
+/* ---------- Edition / Configurator ---------- */
+.edition{min-height:100vh;padding:16vh 4vw 10vh;display:grid;grid-template-columns:1fr minmax(0,500px);align-items:center;gap:4vw}
+.config{border-radius:24px;padding:40px 40px 34px}
+.config .sec-title{font-size:clamp(34px,3.4vw,52px);margin:16px 0 6px}
+.ed-name{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--gold)}
+.ed-desc{font-size:13.5px;line-height:1.7;color:var(--muted);margin:12px 0 28px;min-height:46px;font-weight:300}
+.opt-label{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+.opt-label span:last-child{color:var(--ivory)}
+.ed-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+.ed-opt{
+  border:1px solid var(--line);border-radius:14px;padding:14px 10px 12px;min-height:44px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  font-size:12px;color:var(--muted);transition:border-color .4s, color .4s, background .4s;
+}
+.ed-opt .sw{width:26px;height:26px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18), 0 0 0 0 transparent;transition:box-shadow .5s}
+.ed-opt:hover{border-color:rgba(255,255,255,.24);color:var(--ivory)}
+.ed-opt[aria-pressed="true"]{border-color:var(--gold);color:var(--ivory);background:rgba(212,175,55,.07)}
+.ed-opt[aria-pressed="true"] .sw{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25), 0 0 0 4px rgba(212,175,55,.18)}
+.size-toggle{position:relative;display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:30px}
+.size-toggle .pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--ivory);transition:transform .7s var(--ease)}
+.size-toggle[data-size="100"] .pill{transform:translateX(100%)}
+.size-opt{position:relative;z-index:1;padding:13px 8px;min-height:44px;border-radius:999px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);transition:color .5s}
+.size-opt[aria-pressed="true"]{color:var(--bg);font-weight:600}
+.buy-row{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding-top:24px;border-top:1px solid var(--line)}
+.price{font-family:var(--serif);font-weight:300;font-size:54px;line-height:1;font-variant-numeric:tabular-nums}
+.price-note{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:.04em}
+.btn-gold{
+  position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  padding:18px 30px;min-height:52px;border-radius:999px;background:linear-gradient(135deg,#e6c565,var(--gold) 45%,var(--gold-deep));color:#120e05;
+  font-size:11px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;white-space:nowrap;
+  box-shadow:0 10px 40px -10px rgba(212,175,55,.5);transition:transform .5s var(--ease), box-shadow .5s;
+}
+.btn-gold::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:left .9s var(--ease)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 50px -10px rgba(212,175,55,.65)}
+.btn-gold:hover::after{left:130%}
+.btn-gold:disabled{opacity:.6;cursor:progress}
+.perks{display:flex;gap:22px;flex-wrap:wrap;margin-top:22px;font-size:11px;color:var(--faint);letter-spacing:.04em}
+.perks span{display:inline-flex;align-items:center;gap:8px}
+.perks span::before{content:"";width:5px;height:5px;border:1px solid var(--gold);transform:rotate(45deg)}
+
+/* ---------- Footer ---------- */
+.footer{position:relative;z-index:10;padding:9vh 4vw 6vh;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;background:linear-gradient(transparent,rgba(7,7,9,.85))}
+.footer .logo{font-size:34px}
+.footer p{font-size:12px;color:var(--faint);line-height:1.8;max-width:340px}
+.footer small{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--faint)}
+
+/* ---------- Cart drawer ---------- */
+.scrim{position:fixed;inset:0;z-index:80;background:rgba(3,3,4,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .6s ease}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;z-index:90;width:min(440px,100%);display:flex;flex-direction:column;
+  background:rgba(11,11,13,.94);border-left:1px solid var(--line);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  transform:translateX(102%);transition:transform .75s var(--ease);visibility:hidden;
+}
+.drawer.open{transform:none;visibility:visible}
+.drawer.closing{visibility:visible}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:26px 28px;border-bottom:1px solid var(--line)}
+.drawer-head h2{font-family:var(--serif);font-weight:400;font-size:28px}
+.drawer-head h2 span{font-family:var(--sans);font-size:11px;color:var(--faint);letter-spacing:.2em;margin-left:10px;vertical-align:middle}
+.icon-btn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;transition:border-color .4s, transform .6s var(--ease)}
+.icon-btn:hover{border-color:var(--gold);transform:rotate(90deg)}
+.icon-btn svg{width:14px;height:14px}
+.drawer-body{flex:1;overflow-y:auto;padding:10px 28px}
+.empty{height:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;color:var(--muted)}
+.empty .logo-mark{width:14px;height:14px}
+.empty h3{font-family:var(--serif);font-weight:400;font-size:26px;color:var(--ivory)}
+.empty p{font-size:13px;max-width:240px;line-height:1.6}
+.item{display:grid;grid-template-columns:64px 1fr auto;gap:16px;padding:22px 0;border-bottom:1px solid var(--line);align-items:center}
+.item-thumb{width:64px;height:80px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,0))}
+.item-thumb i{width:30px;height:38px;border-radius:5px;box-shadow:0 0 18px currentColor, inset 0 0 0 1px rgba(255,255,255,.25)}
+.item h4{font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.1}
+.item .meta{font-size:11px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;margin-top:5px}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;margin-top:12px}
+.qty button{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);transition:color .3s}
+.qty button:hover{color:var(--gold)}
+.qty span{min-width:22px;text-align:center;font-size:13px;font-variant-numeric:tabular-nums}
+.item-right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.item-price{font-family:var(--serif);font-size:22px;font-variant-numeric:tabular-nums}
+.remove{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid transparent;padding:6px 0;transition:color .3s,border-color .3s}
+.remove:hover{color:var(--ivory);border-color:var(--gold)}
+.drawer-foot{padding:24px 28px 28px;border-top:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:10px}
+.row.total{color:var(--ivory);font-size:14px;margin:16px 0 20px;align-items:baseline}
+.row.total b{font-family:var(--serif);font-weight:400;font-size:32px;font-variant-numeric:tabular-nums}
+.drawer-foot .btn-gold{width:100%}
+.secure{text-align:center;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-top:14px}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;left:50%;bottom:32px;z-index:120;transform:translateX(-50%);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:16px;padding:16px 22px 16px 16px;border-radius:16px;min-width:min(420px,92vw);
+  background:rgba(14,13,12,.9);border:1px solid rgba(212,175,55,.35);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.8);
+}
+.toast-icon{width:40px;height:40px;border-radius:50%;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center;flex:none}
+.toast-icon svg{width:16px;height:16px}
+.toast b{display:block;font-family:var(--serif);font-weight:500;font-size:20px}
+.toast span{font-size:12px;color:var(--muted)}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px){
+  .nav-links{display:none}
+  .notes-grid{grid-template-columns:1fr}
+  .notes{padding-top:46vh}
+  .edition{grid-template-columns:1fr;padding-top:52vh}
+  .config{padding:30px 24px 26px}
+}
+@media (max-width: 640px){
+  .hl{font-size:clamp(38px,11vw,60px)}
+  .hl-1{top:20vh}
+  .hl-2{bottom:27vh}
+  .hero-foot{flex-direction:column;align-items:flex-start}
+  .hero-meta,.scroll-hint{display:none}
+  .hero .eyebrow{top:96px}
+  .note-card{grid-template-columns:38px 1fr;padding:22px}
+  .note-time{display:none}
+  .buy-row{flex-direction:column;align-items:stretch}
+  .btn-gold{width:100%}
+  .callout{width:min(190px,46vw);padding:12px 14px}
+  .callout h3{font-size:17px}
+  .callout p{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .grain,.scroll-hint i::after,#callouts .ring{animation:none}
+}
+</style>
+</head>
+<body class="is-loading">
+
+<!-- Preloader curtain -->
+<div id="preloader" aria-live="polite">
+  <div class="pl-inner">
+    <div class="pl-brand">AURELIA</div>
+    <div class="pl-bar"><i id="plBar"></i></div>
+    <div class="pl-meta"><span>Macerating</span><b><span id="plNum">0</span>%</b></div>
+    <div class="pl-sub">L'Élixir Nocturne</div>
+  </div>
+</div>
+
+<canvas id="webgl" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- Exploded-view callouts (positions projected from the 3D model every frame) -->
+<div id="callouts" aria-hidden="true">
+  <svg>
+    <polyline id="cl-line-0" points=""/><polyline id="cl-line-1" points=""/><polyline id="cl-line-2" points=""/>
+    <circle class="ring" id="cl-ring-0" r="7" cx="0" cy="0"/><circle class="ring" id="cl-ring-1" r="7" cx="0" cy="0"/><circle class="ring" id="cl-ring-2" r="7" cx="0" cy="0"/>
+    <circle class="dot" id="cl-dot-0" r="3.5" cx="0" cy="0"/><circle class="dot" id="cl-dot-1" r="3.5" cx="0" cy="0"/><circle class="dot" id="cl-dot-2" r="3.5" cx="0" cy="0"/>
+  </svg>
+  <div class="callout frost" id="cl-box-0">
+    <div class="num">01 — FLACON</div>
+    <h3>Hand-Polished French Crystal</h3>
+    <p>Each facet is cut and polished by hand in Normandy, so the glass carries the weight of a heirloom.</p>
+  </div>
+  <div class="callout frost" id="cl-box-1">
+    <div class="num">02 — ATOMIZER</div>
+    <h3>24K Gold Micro-Mist Atomizer</h3>
+    <p>A brushed gold collar and a precision valve release a veil of mist finer than morning fog.</p>
+  </div>
+  <div class="callout frost" id="cl-box-2">
+    <div class="num">03 — ELIXIR</div>
+    <h3>90-Day Cold Maceration</h3>
+    <p>The essences rest in darkness at 12°C for ninety days before a single drop is bottled.</p>
+  </div>
+</div>
+
+<!-- Navigation -->
+<header class="nav" id="nav">
+  <a href="#hero" class="logo" data-scroll aria-label="Aurelia, back to top"><span class="logo-mark"></span>AURELIA</a>
+  <ul class="nav-links">
+    <li><a href="#notes" data-scroll>The Notes</a></li>
+    <li><a href="#craft" data-scroll>Craftsmanship</a></li>
+    <li><a href="#edition" data-scroll>The Edition</a></li>
+  </ul>
+  <button class="cart-btn" id="cartBtn" aria-label="Open shopping bag" aria-controls="cart">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>
+    Bag <span class="badge" id="badge">0</span>
+  </button>
+</header>
+
+<main id="main">
+  <!-- 1. HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Maison Aurelia · Paris — Extrait de Parfum</div>
+      <h1 class="hl hl-1" aria-label="Crafted in shadow.">
+        <span class="line"><span class="word">Crafted</span></span>
+        <span class="line"><span class="word">in</span> <span class="word">Shadow.</span></span>
+      </h1>
+      <p class="hl hl-2" aria-label="Worn in light.">
+        <span class="line"><span class="word">Worn</span></span>
+        <span class="line"><span class="word">in</span> <span class="word"><em>Light.</em></span></span>
+      </p>
+      <div class="hero-foot">
+        <div>
+          <p class="hero-copy">An extrait of rare amber, smoked iris and aged oud, cold-macerated for ninety nights and sealed in hand-cut crystal.</p>
+          <a href="#notes" class="cta" data-scroll>Discover the Scent
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M8 2v12M3 9l5 5 5-5"/></svg>
+          </a>
+        </div>
+        <div class="scroll-hint"><i></i>Scroll</div>
+        <div class="hero-meta">Edition <b>N°&nbsp;07</b><br>Concentration <b>28%</b><br>Sillage <b>Enveloping</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. OLFACTORY NOTES -->
+  <section class="notes" id="notes">
+    <div class="notes-grid">
+      <div>
+        <div class="eyebrow reveal">The Olfactory Pyramid</div>
+        <h2 class="sec-title reveal">A scent that <em>unfolds</em><br>like nightfall.</h2>
+        <p class="sec-lead reveal">Three acts, written over hours on the skin. Bright citrus gives way to a smoky floral heart, then settles into a warm, resinous base.</p>
+        <div class="notes-cards">
+          <article class="note-card frost" data-rim="#ffd36e" data-glow="#f2c14e">
+            <div><div class="note-idx">I</div><span class="note-swatch" style="color:#ffd36e;background:#ffd36e"></span></div>
+            <div>
+              <div class="note-tier">Top Notes</div>
+              <div class="note-name">Calabrian Bergamot, Pink Pepper</div>
+              <p class="note-desc">A sparkling, peppery opening, like citrus zest struck in candlelight.</p>
+            </div>
+            <div class="note-time">0 — 20 min</div>
+          </article>
+          <article class="note-card frost" data-rim="#ff5f8a" data-glow="#d9456f">
+            <div><div class="note-idx">II</div><span class="note-swatch" style="color:#ff5f8a;background:#ff5f8a"></span></div>
+            <div>
+              <div class="note-tier">Heart Notes</div>
+              <div class="note-name">Damask Rose, Smoked Iris</div>
+              <p class="note-desc">Velvet petals drawn through cool, powdery smoke.</p>
+            </div>
+            <div class="note-time">20 min — 4 h</div>
+          </article>
+          <article class="note-card frost" data-rim="#b07cff" data-glow="#a2662e">
+            <div><div class="note-idx">III</div><span class="note-swatch" style="color:#c48a3f;background:#c48a3f"></span></div>
+            <div>
+              <div class="note-tier">Base Notes</div>
+              <div class="note-name">Aged Oud, Madagascar Vanilla, Ambergris</div>
+              <p class="note-desc">A deep, resinous trail that lingers long after you have left the room.</p>
+            </div>
+            <div class="note-time">4 h — 12 h+</div>
+          </article>
+        </div>
+      </div>
+      <div></div>
+    </div>
+  </section>
+
+  <!-- 3. EXPLODED CRAFTSMANSHIP -->
+  <section class="craft" id="craft">
+    <div class="craft-sticky">
+      <div>
+        <div class="eyebrow reveal">Craftsmanship</div>
+        <h2 class="sec-title reveal">The anatomy of<br>an <em>heirloom.</em></h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. EDITION CUSTOMIZER -->
+  <section class="edition" id="edition">
+    <div></div>
+    <div class="config frost reveal" id="config">
+      <div class="eyebrow">Compose your Edition</div>
+      <h2 class="sec-title">L'Élixir Nocturne</h2>
+      <div class="ed-name" id="edName">Nocturne Amber</div>
+      <p class="ed-desc" id="edDesc">The signature: liquid gold of amber resin, warm vanilla and a whisper of smoked iris.</p>
+
+      <div class="opt-label"><span>Scent Edition</span><span id="edLabel">Nocturne Amber</span></div>
+      <div class="ed-options" role="group" aria-label="Scent edition">
+        <button class="ed-opt" data-edition="amber" aria-pressed="true"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#f6dc8a,#D4AF37 45%,#8a5d08)"></span>Nocturne Amber</button>
+        <button class="ed-opt" data-edition="rose" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#f3a0b6,#b02e55 45%,#4f0d22)"></span>Velvet Rose</button>
+        <button class="ed-opt" data-edition="oud" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#a7774a,#4a2616 45%,#120806)"></span>Obsidian Oud</button>
+      </div>
+
+      <div class="opt-label"><span>Flacon Size</span><span id="sizeLabel">100 ML</span></div>
+      <div class="size-toggle" id="sizeToggle" data-size="100" role="group" aria-label="Flacon size">
+        <span class="pill" aria-hidden="true"></span>
+        <button class="size-opt" data-size="50" aria-pressed="false">50 ML — $210</button>
+        <button class="size-opt" data-size="100" aria-pressed="true">100 ML — $320</button>
+      </div>
+
+      <div class="buy-row">
+        <div>
+          <div class="price" id="price">$320</div>
+          <div class="price-note">Complimentary engraving &amp; gift coffret</div>
+        </div>
+        <button class="btn-gold" id="addBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>
+          <span>Add to Bag</span>
+        </button>
+      </div>
+      <div class="perks"><span>Free express delivery</span><span>Samples with every order</span><span>30-day returns</span></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>
+      <div class="logo"><span class="logo-mark"></span>AURELIA</div>
+      <p style="margin-top:16px">Haute parfumerie, composed in Paris. A fictional maison, rendered entirely in code.</p>
+    </div>
+    <small>© 2026 Maison Aurelia — L'Élixir Nocturne</small>
+  </footer>
+</main>
+
+<!-- Cart drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="cart" aria-label="Shopping bag" aria-hidden="true" data-lenis-prevent>
+  <div class="drawer-head">
+    <h2>Your Bag <span id="drawerCount">0 ITEMS</span></h2>
+    <button class="icon-btn" id="closeCart" aria-label="Close bag">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="cartItems" data-lenis-prevent></div>
+  <div class="drawer-foot">
+    <div class="row"><span>Shipping</span><span>Complimentary</span></div>
+    <div class="row"><span>Engraving &amp; coffret</span><span>Included</span></div>
+    <div class="row total"><span>Subtotal</span><b id="subtotal">$0</b></div>
+    <button class="btn-gold" id="checkoutBtn"><span>Proceed to Checkout</span></button>
+    <div class="secure">Simulated checkout · No payment taken</div>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <div class="toast-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg></div>
+  <div><b id="toastTitle">Merci.</b><span id="toastMsg">Your order is confirmed.</span></div>
+</div>
+
+<noscript><div style="position:fixed;inset:0;z-index:300;background:#070709;color:#F5F2EB;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:22px">Please enable JavaScript to experience AURELIA.</div></noscript>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+gsap.registerPlugin(ScrollTrigger);
+const $ = (s, c = document) => c.querySelector(s);
+const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
+/* =========================================================
+   PRELOADER
+   ========================================================= */
+const plNum = $('#plNum'), plBar = $('#plBar');
+const prog = { v: 0 };
+let progTween;
+function setProgress(p, d = 0.8) {
+  return new Promise(res => {
+    progTween && progTween.kill();
+    progTween = gsap.to(prog, {
+      v: p, duration: d, ease: 'power2.out',
+      onUpdate() { plNum.textContent = Math.round(prog.v); plBar.style.transform = `scaleX(${prog.v / 100})`; },
+      onComplete: res
+    });
+  });
+}
+setProgress(12);
+
+/* =========================================================
+   LENIS  <->  GSAP ScrollTrigger
+   ========================================================= */
+const lenis = new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.95 });
+lenis.stop();
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(time => lenis.raf(time * 1000));
+gsap.ticker.lagSmoothing(0);
+
+const nav = $('#nav');
+lenis.on('scroll', ({ scroll }) => nav.classList.toggle('scrolled', scroll > 40));
+
+$$('[data-scroll]').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault();
+  lenis.scrollTo(a.getAttribute('href'), { duration: 2, easing: t => 1 - Math.pow(1 - t, 4) });
+}));
+
+/* =========================================================
+   THREE.JS — renderer, scene, camera
+   ========================================================= */
+const canvas = $('#webgl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.setClearColor(0x070709, 1);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 7.6);
+
+const isMobile = () => window.innerWidth < 960;
+function visibleSize() {
+  const h = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  return { w: h * camera.aspect, h };
+}
+let respScale = 1;
+function computeRespScale() { respScale = THREE.MathUtils.clamp(visibleSize().w / 4.6, 0.55, 1); }
+computeRespScale();
+
+/* ---------- Studio environment ---------- */
+const pmrem = new THREE.PMREMGenerator(renderer);
+const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environment = envTex;
+
+/* ---------- Lights ---------- */
+scene.add(new THREE.AmbientLight(0xfff4e0, 0.06));
+const keyLight = new THREE.DirectionalLight(0xffd6a0, 3.2);
+keyLight.position.set(-4, 5, 5);
+scene.add(keyLight);
+const RIM_DEFAULT = new THREE.Color('#6f8fff');
+const rimLight = new THREE.DirectionalLight(RIM_DEFAULT.clone(), 4.5);
+rimLight.position.set(5, 2.5, -4);
+scene.add(rimLight);
+const rimPoint = new THREE.PointLight(RIM_DEFAULT.clone(), 26, 14, 2);
+rimPoint.position.set(-3.6, 1.2, -2.6);
+scene.add(rimPoint);
+const underGlow = new THREE.PointLight(0xd4af37, 14, 9, 2);
+underGlow.position.set(0, -2.4, 1.6);
+scene.add(underGlow);
+
+/* ---------- Shared helpers ---------- */
+function chamferShape(w, h, ct, cb) {
+  const s = new THREE.Shape(), x = w / 2, y = h / 2;
+  s.moveTo(-x + cb, -y); s.lineTo(x - cb, -y); s.lineTo(x, -y + cb);
+  s.lineTo(x, y - ct); s.lineTo(x - ct, y); s.lineTo(-x + ct, y);
+  s.lineTo(-x, y - ct); s.lineTo(-x, -y + cb); s.closePath();
+  return s;
+}
+function slab(shape, depth, bevel) {
+  const g = new THREE.ExtrudeGeometry(shape, {
+    depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 1, curveSegments: 1
+  });
+  g.translate(0, 0, -depth / 2);
+  return g; // non-indexed => crisp faceted normals
+}
+
+/* ---------- Groups (hierarchy) ---------- */
+// scrollGroup: driven by ScrollTrigger | floatGroup: idle float + mouse + intro | sizeGroup: 50/100ml | assembly: parts
+const scrollGroup = new THREE.Group();
+const floatGroup = new THREE.Group();
+const sizeGroup = new THREE.Group();
+const assembly = new THREE.Group();
+assembly.position.y = -0.43;
+scene.add(scrollGroup); scrollGroup.add(floatGroup); floatGroup.add(sizeGroup); sizeGroup.add(assembly);
+
+/* ---------- Materials ---------- */
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xfffaf0, metalness: 0, roughness: 0.06, transmission: 0.92, ior: 1.52, thickness: 1.6,
+  clearcoat: 1, clearcoatRoughness: 0.04, specularIntensity: 1, envMapIntensity: 1.6,
+  attenuationColor: new THREE.Color('#fff1d0'), attenuationDistance: 5
+});
+const liquidMat = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color('#B8862A'), emissive: new THREE.Color('#B8860B'), emissiveIntensity: 0.2,
+  roughness: 0.12, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.6
+});
+const goldMat = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color('#C99A2E'), metalness: 0.95, roughness: 0.18, envMapIntensity: 1.0,
+  clearcoat: 0.3, clearcoatRoughness: 0.25, anisotropy: 0.6
+});
+const darkGoldMat = goldMat.clone(); darkGoldMat.color = new THREE.Color('#a8862a'); darkGoldMat.roughness = 0.28;
+const obsidianMat = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color('#0b0b10'), metalness: 0.35, roughness: 0.09, clearcoat: 1, clearcoatRoughness: 0.03,
+  envMapIntensity: 1.3, flatShading: true
+});
+const tubeMat = new THREE.MeshPhysicalMaterial({ color: 0x8f8a80, roughness: 0.12, metalness: 0.1, clearcoat: 1, envMapIntensity: 1 });
+const holeMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+
+/* ---------- Glass flacon (faceted crystal) ---------- */
+const GLASS_W = 1.5, GLASS_H = 1.9, GLASS_D = 0.75, GLASS_B = 0.12;
+const glass = new THREE.Mesh(slab(chamferShape(GLASS_W, GLASS_H, 0.36, 0.1), GLASS_D, GLASS_B), glassMat);
+assembly.add(glass);
+const FRONT_Z = GLASS_D / 2 + GLASS_B; // 0.495
+const GLASS_TOP = GLASS_H / 2 + GLASS_B; // 1.07
+
+/* ---------- Inner perfume liquid ---------- */
+const liquid = new THREE.Mesh(slab(chamferShape(1.16, 1.18, 0.04, 0.07), 0.46, 0.05), liquidMat);
+liquid.position.y = -0.16;
+assembly.add(liquid);
+
+/* ---------- Procedural front label (high-DPI canvas texture) ---------- */
+const labelCanvas = document.createElement('canvas');
+labelCanvas.width = 1024; labelCanvas.height = 772;
+const lctx = labelCanvas.getContext('2d');
+const labelTex = new THREE.CanvasTexture(labelCanvas);
+labelTex.colorSpace = THREE.SRGBColorSpace;
+labelTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+function spaced(ctx, text, x, y, spacing) {
+  // centered text with manual letter-spacing (works in every browser)
+  const chars = [...text];
+  const widths = chars.map(c => ctx.measureText(c).width);
+  const total = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+  let cx = x - total / 2;
+  ctx.textAlign = 'left';
+  chars.forEach((c, i) => { ctx.fillText(c, cx, y); cx += widths[i] + spacing; });
+}
+function drawLabel(ml = 100) {
+  const W = labelCanvas.width, H = labelCanvas.height, c = lctx;
+  c.clearRect(0, 0, W, H);
+  // label body
+  c.fillStyle = 'rgba(9,9,11,0.86)';
+  c.beginPath(); c.roundRect(8, 8, W - 16, H - 16, 26); c.fill();
+  // gold frames
+  const gold = c.createLinearGradient(0, 0, W, H);
+  gold.addColorStop(0, '#8a6514'); gold.addColorStop(0.35, '#f3d98a'); gold.addColorStop(0.6, '#D4AF37'); gold.addColorStop(1, '#8a6514');
+  c.strokeStyle = gold; c.lineWidth = 4;
+  c.beginPath(); c.roundRect(30, 30, W - 60, H - 60, 16); c.stroke();
+  c.lineWidth = 1.5; c.globalAlpha = 0.6;
+  c.beginPath(); c.roundRect(46, 46, W - 92, H - 92, 10); c.stroke();
+  c.globalAlpha = 1;
+  // ornament diamond
+  c.fillStyle = gold;
+  c.save(); c.translate(W / 2, 128); c.rotate(Math.PI / 4); c.fillRect(-9, -9, 18, 18); c.restore();
+  c.fillRect(W / 2 - 150, 127, 110, 2); c.fillRect(W / 2 + 40, 127, 110, 2);
+  // AURELIA
+  c.textBaseline = 'alphabetic';
+  c.fillStyle = gold;
+  c.font = '500 176px "Cormorant Garamond", serif';
+  spaced(c, 'AURELIA', W / 2, 338, 30);
+  // divider
+  c.fillRect(W / 2 - 190, 392, 380, 2);
+  // subtitle
+  c.fillStyle = '#F5F2EB';
+  c.font = 'italic 500 64px "Cormorant Garamond", serif';
+  spaced(c, "L'ÉLIXIR NOCTURNE", W / 2, 488, 9);
+  // descriptor
+  c.fillStyle = 'rgba(212,175,55,0.92)';
+  c.font = '500 30px "Plus Jakarta Sans", sans-serif';
+  spaced(c, `EXTRAIT DE PARFUM • ${ml} ML`, W / 2, 594, 8);
+  c.fillStyle = 'rgba(245,242,235,0.45)';
+  c.font = '400 22px "Plus Jakarta Sans", sans-serif';
+  spaced(c, 'PARIS', W / 2, 676, 14);
+  labelTex.needsUpdate = true;
+}
+const labelMat = new THREE.MeshPhysicalMaterial({
+  map: labelTex, transparent: true, roughness: 0.38, metalness: 0.25, clearcoat: 0.6, clearcoatRoughness: 0.2, envMapIntensity: 0.6
+});
+const label = new THREE.Mesh(new THREE.PlaneGeometry(1.14, 1.14 * 772 / 1024), labelMat);
+label.position.set(0, -0.2, FRONT_Z + 0.004);
+assembly.add(label);
+
+/* ---------- Atomizer: gold collar, nozzle, dip tube ---------- */
+const collarGroup = new THREE.Group();
+assembly.add(collarGroup);
+const neckRing = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.37, 0.05, 48), darkGoldMat);
+neckRing.position.y = GLASS_TOP + 0.02;
+const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.29, 0.31, 0.22, 64), goldMat);
+collar.position.y = GLASS_TOP + 0.13;
+const collarLip = new THREE.Mesh(new THREE.TorusGeometry(0.295, 0.018, 12, 64), goldMat);
+collarLip.rotation.x = Math.PI / 2; collarLip.position.y = GLASS_TOP + 0.24;
+const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.1, 24), darkGoldMat);
+stem.position.y = GLASS_TOP + 0.29;
+const actuator = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.17, 0.17, 48), goldMat);
+actuator.position.y = GLASS_TOP + 0.42;
+const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.04, 16), holeMat);
+nozzle.rotation.x = Math.PI / 2; nozzle.position.set(0, GLASS_TOP + 0.43, 0.155);
+const tubeLen = GLASS_TOP + 0.78;
+const dipTube = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, tubeLen, 12), tubeMat);
+dipTube.position.y = GLASS_TOP - tubeLen / 2 + 0.05;
+collarGroup.add(neckRing, collar, collarLip, stem, actuator, nozzle, dipTube);
+
+/* ---------- Detachable cap: smoked obsidian + gold ---------- */
+const capGroup = new THREE.Group();
+assembly.add(capGroup);
+const CAP_BASE = GLASS_TOP + 0.05, CAP_H = 0.82;
+const capBody = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.43, CAP_H, 8, 1), obsidianMat);
+capBody.position.y = CAP_BASE + CAP_H / 2;
+capBody.rotation.y = Math.PI / 8;
+const capBand = new THREE.Mesh(new THREE.CylinderGeometry(0.445, 0.445, 0.07, 8), goldMat);
+capBand.position.y = CAP_BASE + 0.05; capBand.rotation.y = Math.PI / 8;
+const capCrown = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.22, 0.04, 8), goldMat);
+capCrown.position.y = CAP_BASE + CAP_H + 0.02; capCrown.rotation.y = Math.PI / 8;
+const capJewel = new THREE.Mesh(new THREE.OctahedronGeometry(0.07, 0), goldMat);
+capJewel.position.y = CAP_BASE + CAP_H + 0.08; capJewel.scale.y = 0.6;
+capGroup.add(capBody, capBand, capCrown, capJewel);
+
+/* ---------- Callout anchors (projected to screen) ---------- */
+const anchorCrystal = new THREE.Object3D(); anchorCrystal.position.set(0.82, 0.35, 0.3); assembly.add(anchorCrystal);
+const anchorAtomizer = new THREE.Object3D(); anchorAtomizer.position.set(0.28, GLASS_TOP + 0.16, 0.1); collarGroup.add(anchorAtomizer);
+const anchorLiquid = new THREE.Object3D(); anchorLiquid.position.set(-0.48, -0.42, 0.24); assembly.add(anchorLiquid);
+
+/* ---------- Ambient glow behind the bottle (additive, seen through the glass) ---------- */
+function radialTexture(size, stops) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const x = c.getContext('2d');
+  x.fillStyle = '#000'; x.fillRect(0, 0, size, size);
+  const g = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  stops.forEach(([o, col]) => g.addColorStop(o, col));
+  x.fillStyle = g; x.fillRect(0, 0, size, size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const glowTex = radialTexture(512, [[0, 'rgba(255,255,255,0.75)'], [0.22, 'rgba(255,255,255,0.32)'], [0.5, 'rgba(255,255,255,0.08)'], [1, 'rgba(0,0,0,1)']]);
+const glowMat = new THREE.MeshBasicMaterial({
+  map: glowTex, color: new THREE.Color('#D4AF37').multiplyScalar(0.42),
+  blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
+});
+const glow = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), glowMat);
+glow.position.z = -2.8;
+scene.add(glow);
+
+/* ---------- Golden mist particles ---------- */
+const dotTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,240,200,1)'); g.addColorStop(0.3, 'rgba(255,215,120,.6)'); g.addColorStop(1, 'rgba(255,200,80,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+})();
+const P_COUNT = 150;
+const pBase = new Float32Array(P_COUNT * 3);
+const pPos = new Float32Array(P_COUNT * 3);
+const pSeed = new Float32Array(P_COUNT * 3);
+for (let i = 0; i < P_COUNT; i++) {
+  const r = 1.35 + Math.random() * 2.5;
+  const th = Math.random() * Math.PI * 2;
+  const ph = Math.acos(2 * Math.random() - 1);
+  pBase[i * 3] = r * Math.sin(ph) * Math.cos(th);
+  pBase[i * 3 + 1] = r * Math.cos(ph) * 0.85;
+  pBase[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th) * 0.7;
+  pSeed[i * 3] = Math.random() * Math.PI * 2;
+  pSeed[i * 3 + 1] = 0.2 + Math.random() * 0.5;
+  pSeed[i * 3 + 2] = Math.random();
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+const pMat = new THREE.PointsMaterial({
+  size: 0.05, map: dotTex, color: 0xd4af37, transparent: true, opacity: 0.7,
+  depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+});
+const particles = new THREE.Points(pGeo, pMat);
+particles.frustumCulled = false;
+scene.add(particles);
+
+/* =========================================================
+   STATE driven by GSAP (scroll + UI)
+   ========================================================= */
+const S = { x: 0, y: 0, rx: 0, ry: 0, rz: 0, s: 1, cap: 0, collar: 0, mist: 0, call: 0 };
+const intro = { s: 0.55, r: -1.6, y: -0.9 };
+const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+window.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  mouse.tx = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.ty = (e.clientY / window.innerHeight) * 2 - 1;
+});
+
+/* =========================================================
+   CALLOUT PROJECTION
+   ========================================================= */
+const callouts = [
+  { obj: anchorCrystal, side: 1, dy: 30 },
+  { obj: anchorAtomizer, side: 1, dy: -70 },
+  { obj: anchorLiquid, side: -1, dy: 40 }
+].map((c, i) => ({
+  ...c,
+  line: $('#cl-line-' + i), dot: $('#cl-dot-' + i), ring: $('#cl-ring-' + i), box: $('#cl-box-' + i)
+}));
+const calloutLayer = $('#callouts');
+const _v = new THREE.Vector3();
+function updateCallouts() {
+  calloutLayer.style.opacity = S.call.toFixed(3);
+  calloutLayer.style.visibility = S.call > 0.01 ? 'visible' : 'hidden';
+  if (S.call <= 0.01) return;
+  const W = window.innerWidth, H = window.innerHeight;
+  const dx = isMobile() ? Math.min(70, W * 0.12) : Math.min(200, W * 0.14);
+  callouts.forEach((c, i) => {
+    c.obj.getWorldPosition(_v).project(camera);
+    const sx = (_v.x * 0.5 + 0.5) * W, sy = (-_v.y * 0.5 + 0.5) * H;
+    let lx = sx + c.side * dx, ly = sy + c.dy * (isMobile() ? 0.6 : 1);
+    const bw = c.box.offsetWidth, bh = c.box.offsetHeight;
+    // keep labels on-screen
+    if (c.side > 0) lx = Math.min(lx, W - bw - 12); else lx = Math.max(lx, bw + 12);
+    ly = THREE.MathUtils.clamp(ly, bh / 2 + 80, H - bh / 2 - 20);
+    const ex = sx + c.side * Math.min(36, Math.abs(lx - sx) * 0.4);
+    c.line.setAttribute('points', `${sx},${sy} ${ex},${ly} ${lx},${ly}`);
+    c.dot.setAttribute('cx', sx); c.dot.setAttribute('cy', sy);
+    c.ring.setAttribute('cx', sx); c.ring.setAttribute('cy', sy);
+    const reveal = THREE.MathUtils.clamp(S.call * 3 - i * 0.9, 0, 1);
+    c.box.style.opacity = reveal;
+    c.box.style.transform = `translate(${lx + (c.side < 0 ? -bw : 0)}px, ${ly - bh / 2 + (1 - reveal) * 14}px)`;
+  });
+}
+
+/* =========================================================
+   RENDER LOOP
+   ========================================================= */
+const clock = new THREE.Clock();
+function tick() {
+  const t = clock.getElapsedTime();
+  mouse.x += (mouse.tx - mouse.x) * 0.05;
+  mouse.y += (mouse.ty - mouse.y) * 0.05;
+
+  // scroll-driven transform
+  scrollGroup.position.set(S.x, S.y, 0);
+  scrollGroup.rotation.set(S.rx, S.ry, S.rz);
+  scrollGroup.scale.setScalar(S.s);
+
+  // idle float + mouse parallax + intro
+  floatGroup.position.y = Math.sin(t * 0.9) * 0.055 + intro.y;
+  floatGroup.rotation.x = mouse.y * 0.14;
+  floatGroup.rotation.y = mouse.x * 0.32 + Math.sin(t * 0.32) * 0.14 + intro.r;
+  floatGroup.rotation.z = Math.sin(t * 0.6) * 0.015 - mouse.x * 0.03;
+  floatGroup.scale.setScalar(respScale * intro.s);
+
+  // exploded parts
+  capGroup.position.y = S.cap * 0.95 + Math.sin(t * 1.4) * 0.03 * S.cap;
+  capGroup.rotation.y = S.cap * 0.9;
+  capGroup.rotation.z = S.cap * 0.08;
+  collarGroup.position.y = S.collar * 0.3;
+
+  // glow follows bottle
+  glow.position.x = scrollGroup.position.x * 0.9;
+  glow.position.y = scrollGroup.position.y - 0.1;
+  glow.scale.setScalar(respScale * (1 + S.mist * 0.25));
+
+  // particles
+  particles.position.copy(scrollGroup.position);
+  const spread = 1 + S.mist * 0.9;
+  for (let i = 0; i < P_COUNT; i++) {
+    const k = i * 3, ph = pSeed[k], sp = pSeed[k + 1];
+    pPos[k] = pBase[k] * spread * respScale + Math.sin(t * sp + ph) * 0.12;
+    pPos[k + 1] = pBase[k + 1] * spread * respScale + Math.sin(t * sp * 0.8 + ph * 1.7) * 0.16 + Math.sin(t * 0.2 + pSeed[k + 2] * 6) * 0.08;
+    pPos[k + 2] = pBase[k + 2] * spread * respScale + Math.cos(t * sp * 0.9 + ph) * 0.1;
+  }
+  pGeo.attributes.position.needsUpdate = true;
+  particles.rotation.y = t * 0.03;
+  pMat.opacity = 0.55 + S.mist * 0.35 + Math.sin(t * 2) * 0.05;
+  pMat.size = 0.05 * (1 + S.mist * 0.35) * (0.8 + respScale * 0.2);
+
+  renderer.render(scene, camera);
+  updateCallouts();
+}
+
+/* =========================================================
+   SCROLL CHOREOGRAPHY
+   ========================================================= */
+const K = {
+  hero: () => ({ x: 0, y: 0, rx: 0, ry: 0, rz: 0, s: 1 }),
+  notes: () => ({
+    x: isMobile() ? 0 : visibleSize().w * 0.23, y: isMobile() ? 1.05 : 0,
+    rx: 0.08, ry: -0.62, rz: -0.13, s: isMobile() ? 0.7 : 0.95
+  }),
+  craft: () => ({ x: 0, y: isMobile() ? -0.35 : -0.62, rx: -0.04, ry: 0.48, rz: 0, s: isMobile() ? 0.74 : 0.8 }),
+  shop: () => ({
+    x: isMobile() ? 0 : -visibleSize().w * 0.21, y: isMobile() ? 1.05 : -0.05,
+    rx: 0, ry: -0.28, rz: 0.04, s: isMobile() ? 0.66 : 1
+  })
+};
+/*
+  One master timeline scrubbed across the whole page. Its time unit is scroll pixels,
+  so each segment is placed exactly where its section enters the viewport.
+  (Separate scrubbed ScrollTriggers on the same object would fight on refresh.)
+*/
+let master = null;
+function scrollAt(sel, edge, viewportFrac) {
+  const el = $(sel), r = el.getBoundingClientRect();
+  const top = r.top + window.scrollY;
+  const y = edge === 'top' ? top : top + r.height;
+  return Math.max(0, y - window.innerHeight * viewportFrac);
+}
+function buildMaster() {
+  if (master) { master.scrollTrigger && master.scrollTrigger.kill(); master.kill(); }
+  const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  const kH = K.hero(), kN = K.notes(), kC = K.craft(), kS = K.shop();
+  master = gsap.timeline({
+    defaults: { ease: 'none', immediateRender: false },
+    scrollTrigger: { start: 0, end: () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight), scrub: 1.2 }
+  });
+  master.to({}, { duration: max }, 0); // timeline length == scrollable distance
+  master.set(S, { ...kH, cap: 0, collar: 0, mist: 0, call: 0 }, 0);
+  const seg = (a, b, from, to) => { if (b > a) master.fromTo(S, from, { ...to, duration: b - a }, a); };
+
+  // Hero -> Notes: glide right + tilt
+  seg(scrollAt('#notes', 'top', 1), scrollAt('#notes', 'top', 0.15), kH, kN);
+  // Notes -> Craft: return to center
+  const craftIn = scrollAt('#craft', 'top', 1), craftSet = scrollAt('#craft', 'top', 0.2);
+  seg(craftIn, craftSet, kN, kC);
+  // Exploded view: cap levitates, collar rises, mist expands
+  const exA = scrollAt('#craft', 'top', 0.55), exB = scrollAt('#craft', 'bottom', 1);
+  seg(exA, exB, { cap: 0, collar: 0, mist: 0 }, { cap: 1, collar: 1, mist: 1 });
+  // Callouts in
+  seg(scrollAt('#craft', 'top', 0.4), scrollAt('#craft', 'top', 0), { call: 0 }, { call: 1 });
+  // Craft -> Shop: reassemble and settle left
+  const shA = Math.max(exB, scrollAt('#edition', 'top', 1)), shB = scrollAt('#edition', 'top', 0.15);
+  seg(shA, shB, { ...kC, cap: 1, collar: 1, mist: 1 }, { ...kS, cap: 0, collar: 0, mist: 0 });
+  // Callouts out
+  seg(scrollAt('#edition', 'top', 0.85), scrollAt('#edition', 'top', 0.55), { call: 1 }, { call: 0 });
+}
+let rebuildTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(() => { buildMaster(); ScrollTrigger.refresh(); }, 250);
+});
+
+function buildScroll() {
+  buildMaster();
+
+  // Hero text drifts away
+  gsap.to('.hero-inner', {
+    yPercent: -12, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom 25%', scrub: true }
+  });
+
+  // Section reveals
+  $$('.reveal').forEach(el => {
+    gsap.from(el, {
+      y: 46, opacity: 0, duration: 1.4, ease: 'expo.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' }
+    });
+  });
+  gsap.from('.note-card', {
+    x: -80, opacity: 0, duration: 1.4, ease: 'expo.out', stagger: 0.16,
+    scrollTrigger: { trigger: '.notes-cards', start: 'top 80%', toggleActions: 'play none none reverse' }
+  });
+}
+
+/* =========================================================
+   NOTES — hover shifts rim light colour
+   ========================================================= */
+function tweenColor(target, color, dur = 1.2) {
+  const c = color instanceof THREE.Color ? color : new THREE.Color(color);
+  return gsap.to(target, { r: c.r, g: c.g, b: c.b, duration: dur, ease: 'power2.inOut', overwrite: 'auto' });
+}
+$$('.note-card').forEach(card => {
+  card.addEventListener('mouseenter', () => {
+    tweenColor(rimLight.color, card.dataset.rim, 0.8);
+    tweenColor(rimPoint.color, card.dataset.rim, 0.8);
+    gsap.to(rimLight, { intensity: 7, duration: 0.8 });
+    gsap.to(rimPoint, { intensity: 40, duration: 0.8 });
+  });
+  card.addEventListener('mouseleave', () => {
+    tweenColor(rimLight.color, RIM_DEFAULT, 1.1);
+    tweenColor(rimPoint.color, RIM_DEFAULT, 1.1);
+    gsap.to(rimLight, { intensity: 4.5, duration: 1.1 });
+    gsap.to(rimPoint, { intensity: 26, duration: 1.1 });
+  });
+});
+
+/* =========================================================
+   CONFIGURATOR
+   ========================================================= */
+const EDITIONS = {
+  amber: {
+    name: 'Nocturne Amber', liquid: '#B8862A', emissive: '#B8860B', glow: '#D4AF37', glowI: 0.42, swatch: '#D4AF37',
+    desc: 'The signature: liquid gold of amber resin, warm vanilla and a whisper of smoked iris.'
+  },
+  rose: {
+    name: 'Velvet Rose', liquid: '#9B1E44', emissive: '#7a0f30', glow: '#c2456b', glowI: 0.45, swatch: '#c2456b',
+    desc: 'Damask rose absolute, deepened with pink pepper and a velvet base of ambergris.'
+  },
+  oud: {
+    name: 'Obsidian Oud', liquid: '#3a1d10', emissive: '#2a1206', glow: '#9a6430', glowI: 0.5, swatch: '#8c5a2e',
+    desc: 'Aged Assam oud and black amber, smouldering like embers in an unlit room.'
+  }
+};
+const PRICES = { 50: 210, 100: 320 };
+const state = { edition: 'amber', size: 100 };
+const priceEl = $('#price');
+const priceObj = { v: 320 };
+
+function setEdition(key) {
+  if (!EDITIONS[key]) return;
+  state.edition = key;
+  const e = EDITIONS[key];
+  tweenColor(liquidMat.color, e.liquid, 1.4);
+  tweenColor(liquidMat.emissive, e.emissive, 1.4);
+  tweenColor(glowMat.color, new THREE.Color(e.glow).multiplyScalar(e.glowI), 1.4);
+  tweenColor(underGlow.color, e.glow, 1.4);
+  tweenColor(pMat.color, key === 'rose' ? '#f0a0b4' : key === 'oud' ? '#c98d4a' : '#d4af37', 1.4);
+  gsap.fromTo(liquidMat, { emissiveIntensity: 0.9 }, { emissiveIntensity: 0.2, duration: 1.6, ease: 'power2.out' });
+  $$('.ed-opt').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.edition === key)));
+  const swap = [$('#edName'), $('#edDesc'), $('#edLabel')];
+  gsap.to(swap, {
+    opacity: 0, y: -6, duration: 0.25, ease: 'power2.in', onComplete() {
+      $('#edName').textContent = e.name; $('#edLabel').textContent = e.name; $('#edDesc').textContent = e.desc;
+      gsap.to(swap, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' });
+    }
+  });
+}
+function setSize(ml) {
+  ml = Number(ml);
+  state.size = ml;
+  const s = ml === 50 ? 0.82 : 1;
+  gsap.to(sizeGroup.scale, { x: s, y: s, z: s, duration: 1.3, ease: 'expo.inOut' });
+  gsap.to(priceObj, {
+    v: PRICES[ml], duration: 0.9, ease: 'power3.out',
+    onUpdate() { priceEl.textContent = '$' + Math.round(priceObj.v); }
+  });
+  $('#sizeToggle').dataset.size = String(ml);
+  $$('.size-opt').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.size) === ml)));
+  $('#sizeLabel').textContent = ml + ' ML';
+  drawLabel(ml);
+}
+$$('.ed-opt').forEach(b => b.addEventListener('click', () => setEdition(b.dataset.edition)));
+$$('.size-opt').forEach(b => b.addEventListener('click', () => setSize(b.dataset.size)));
+
+/* =========================================================
+   CART
+   ========================================================= */
+const cart = [];
+const fmt = n => '$' + n.toLocaleString('en-US');
+const drawer = $('#cart'), scrim = $('#scrim'), badge = $('#badge');
+
+function addToBag() {
+  const key = state.edition + '-' + state.size;
+  const found = cart.find(i => i.key === key);
+  if (found) found.qty++;
+  else cart.push({ key, edition: state.edition, size: state.size, price: PRICES[state.size], qty: 1 });
+  renderCart(true);
+  const btn = $('#addBtn span');
+  btn.textContent = 'Added to Bag';
+  setTimeout(() => { btn.textContent = 'Add to Bag'; }, 1600);
+  // a little celebratory mist burst on the 3D bottle
+  gsap.fromTo(S, { mist: 0.6 }, { mist: 0, duration: 1.6, ease: 'power2.out', overwrite: false });
+  setTimeout(openCart, 380);
+}
+function renderCart(pop = false) {
+  const count = cart.reduce((a, i) => a + i.qty, 0);
+  const subtotal = cart.reduce((a, i) => a + i.qty * i.price, 0);
+  badge.textContent = count;
+  $('#drawerCount').textContent = `${count} ITEM${count === 1 ? '' : 'S'}`;
+  $('#subtotal').textContent = fmt(subtotal);
+  $('#checkoutBtn').disabled = count === 0;
+  if (pop) gsap.fromTo(badge, { scale: 1.6 }, { scale: 1, duration: 0.7, ease: 'elastic.out(1,0.4)' });
+
+  const list = $('#cartItems');
+  if (!cart.length) {
+    list.innerHTML = `<div class="empty"><span class="logo-mark"></span><h3>Your bag is empty</h3><p>Compose your edition of L'Élixir Nocturne to begin.</p></div>`;
+    return;
+  }
+  list.innerHTML = cart.map(i => {
+    const e = EDITIONS[i.edition];
+    return `<div class="item" data-key="${i.key}">
+      <div class="item-thumb"><i style="color:${e.swatch};background:${e.swatch}"></i></div>
+      <div>
+        <h4>${e.name}</h4>
+        <div class="meta">Extrait de Parfum · ${i.size} ML</div>
+        <div class="qty">
+          <button data-act="dec" aria-label="Decrease quantity">&minus;</button>
+          <span>${i.qty}</span>
+          <button data-act="inc" aria-label="Increase quantity">+</button>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">${fmt(i.price * i.qty)}</div>
+        <button class="remove" data-act="rm">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+$('#cartItems').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const key = btn.closest('.item').dataset.key;
+  const idx = cart.findIndex(i => i.key === key);
+  if (idx < 0) return;
+  const act = btn.dataset.act;
+  if (act === 'inc') cart[idx].qty++;
+  if (act === 'dec') cart[idx].qty--;
+  if (act === 'rm' || cart[idx].qty <= 0) {
+    const row = btn.closest('.item');
+    gsap.to(row, { opacity: 0, x: 40, duration: 0.35, ease: 'power2.in', onComplete() { cart.splice(cart.findIndex(i => i.key === key), 1); renderCart(true); } });
+    return;
+  }
+  renderCart(true);
+});
+
+let lastFocus = null;
+function openCart() {
+  lastFocus = document.activeElement;
+  drawer.classList.add('open'); scrim.classList.add('open');
+  drawer.setAttribute('aria-hidden', 'false');
+  lenis.stop();
+  gsap.fromTo('#cartItems .item, #cartItems .empty', { opacity: 0, x: 30 }, { opacity: 1, x: 0, stagger: 0.07, duration: 0.8, delay: 0.25, ease: 'expo.out' });
+  setTimeout(() => $('#closeCart').focus(), 300);
+}
+function closeCart() {
+  drawer.classList.remove('open'); scrim.classList.remove('open');
+  drawer.setAttribute('aria-hidden', 'true');
+  lenis.start();
+  lastFocus && lastFocus.focus && lastFocus.focus({ preventScroll: true });
+}
+$('#cartBtn').addEventListener('click', openCart);
+$('#closeCart').addEventListener('click', closeCart);
+scrim.addEventListener('click', closeCart);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('open')) closeCart(); });
+$('#addBtn').addEventListener('click', addToBag);
+
+const toast = $('#toast');
+function showToast(title, msg) {
+  $('#toastTitle').textContent = title; $('#toastMsg').textContent = msg;
+  gsap.killTweensOf(toast);
+  gsap.timeline()
+    .fromTo(toast, { opacity: 0, y: 30, xPercent: 0 }, { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' })
+    .to(toast, { opacity: 0, y: 20, duration: 0.6, ease: 'power2.in' }, '+=3.6');
+}
+$('#checkoutBtn').addEventListener('click', () => {
+  if (!cart.length) return;
+  const btn = $('#checkoutBtn'), label = $('#checkoutBtn span');
+  btn.disabled = true; label.textContent = 'Processing…';
+  setTimeout(() => {
+    const total = cart.reduce((a, i) => a + i.qty * i.price, 0);
+    const order = 'AUR-' + Math.floor(100000 + Math.random() * 900000);
+    cart.length = 0;
+    renderCart();
+    label.textContent = 'Proceed to Checkout';
+    closeCart();
+    showToast('Merci. Order confirmed.', `${order} · ${fmt(total)} — a simulated checkout, nothing was charged.`);
+  }, 1500);
+});
+renderCart();
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  computeRespScale();
+});
+
+/* =========================================================
+   HERO ENTRANCE
+   ========================================================= */
+function heroIntro() {
+  const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+  tl.to(intro, { s: 1, r: 0, y: 0, duration: 2.8 }, 0)
+    .from('.nav > *', { y: -24, opacity: 0, duration: 1.3, stagger: 0.1 }, 0.35)
+    .from('.hero .eyebrow', { y: 16, opacity: 0, duration: 1.3 }, 0.5)
+    .from('.hl .word', { yPercent: 118, rotate: 3, duration: 1.6, stagger: 0.08 }, 0.55)
+    .from('.hero-foot > *', { y: 26, opacity: 0, duration: 1.3, stagger: 0.12 }, 1.05)
+    .add(() => { lenis.start(); ScrollTrigger.refresh(); }, 1.1);
+  return tl;
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+async function boot() {
+  try {
+    const fontLoads = Promise.all([
+      document.fonts.load('500 176px "Cormorant Garamond"'),
+      document.fonts.load('italic 500 64px "Cormorant Garamond"'),
+      document.fonts.load('500 30px "Plus Jakarta Sans"')
+    ]);
+    await Promise.race([fontLoads, new Promise(r => setTimeout(r, 3500))]);
+    setProgress(42);
+    drawLabel(100);
+    setProgress(64);
+    await new Promise(r => requestAnimationFrame(r));
+    renderer.compile(scene, camera);
+    setProgress(86);
+    tick(); // first frame (warms up transmission pass)
+    renderer.setAnimationLoop(tick);
+    buildScroll();
+  } catch (err) {
+    console.error('AURELIA 3D init failed:', err);
+  }
+  await setProgress(100, 0.7);
+  document.body.classList.remove('is-loading');
+  gsap.timeline()
+    .to('.pl-inner', { opacity: 0, y: -24, duration: 0.6, ease: 'power2.in' })
+    .to('#preloader', { yPercent: -100, duration: 1.2, ease: 'expo.inOut' }, '-=0.1')
+    .add(heroIntro(), '-=0.75')
+    .set('#preloader', { display: 'none' });
+}
+boot();
+</script>
+</body>
+</html>
