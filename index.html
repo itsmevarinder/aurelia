@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AURELIA — L'Élixir Nocturne · Extrait de Parfum</title>
-<meta name="description" content="Maison Aurelia, Paris. L'Élixir Nocturne — an extrait de parfum crafted in shadow, worn in light.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://images.unsplash.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?auto=format&fit=crop&w=2000&q=70">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AURELIA — L'Élixir Nocturne · Extrait de Parfum</title>
+    <meta name="description"
+      content="Maison Aurelia, Paris. L'Élixir Nocturne — an extrait de parfum crafted in shadow, worn in light.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet">
+    <link rel="preload" as="image"
+      href="https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?auto=format&fit=crop&w=2000&q=70">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
@@ -24,1529 +31,344 @@
 }
 </script>
 
-<style>
-:root{
-  --bg:#070709;
-  --ivory:#F5F2EB;
-  --gold:#D4AF37;
-  --gold-deep:#B8860B;
-  --hair:rgba(212,175,55,0.22);
-  --line:rgba(255,255,255,0.08);
-  --muted:rgba(245,242,235,0.64);
-  --faint:rgba(245,242,235,0.42);
-  --panel:rgba(14,13,12,0.42);
-  --serif:'Cormorant Garamond','Times New Roman',serif;
-  --sans:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
-  --ease:cubic-bezier(.7,0,.2,1);
-  --ease-out:cubic-bezier(.16,1,.3,1);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html.lenis,html.lenis body{height:auto}
-.lenis.lenis-smooth{scroll-behavior:auto!important}
-.lenis.lenis-stopped{overflow:hidden}
-.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
-html{background:var(--bg)}
-body{
-  background:var(--bg);color:var(--ivory);font-family:var(--sans);font-weight:400;font-size:15px;
-  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;
-  font-feature-settings:"kern","liga","onum";
-}
-body.is-loading{overflow:hidden;height:100vh}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
-::selection{background:var(--gold);color:var(--bg)}
-:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+  </head>
+  <body class="is-loading">
 
-/* ============ Atmosphere layers ============ */
-#webgl{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:block}
-/* tactile obsidian-paper texture (real photograph), blended softly over the scene */
-.atmos{
-  position:fixed;inset:-8% 0;z-index:2;pointer-events:none;
-  background:#070709 url("https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?auto=format&fit=crop&w=2000&q=70") center/cover no-repeat;
-  mix-blend-mode:screen;opacity:.13;filter:grayscale(1) contrast(1.25) brightness(.9);
-  will-change:transform;
-}
-.vignette{
-  position:fixed;inset:0;z-index:3;pointer-events:none;
-  background:
-    radial-gradient(120% 95% at 50% 46%,transparent 42%,rgba(0,0,0,.66) 100%),
-    linear-gradient(180deg,rgba(0,0,0,.35),transparent 18%,transparent 82%,rgba(0,0,0,.45));
-}
-/* 35mm film grain */
-.grain{
-  position:fixed;inset:-100%;z-index:4;pointer-events:none;opacity:.035;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  animation:grain .9s steps(7) infinite;
-}
-@keyframes grain{0%{transform:translate(0,0)}15%{transform:translate(-4%,3%)}30%{transform:translate(3%,-5%)}45%{transform:translate(-6%,-2%)}60%{transform:translate(5%,4%)}75%{transform:translate(-2%,6%)}90%{transform:translate(4%,-3%)}100%{transform:translate(0,0)}}
+    <div id="preloader" aria-live="polite">
+      <div class="pl-inner">
+        <div class="pl-mark">Maison fondée à Paris</div>
+        <div class="pl-brand">AURELIA</div>
+        <div class="pl-bar"><i id="plBar"></i></div>
+        <div class="pl-meta"><span>Macération</span><b><span
+              id="plNum">0</span>%</b></div>
+      </div>
+    </div>
 
-/* ============ Preloader ============ */
-#preloader{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;align-items:center;justify-content:center}
-.pl-inner{width:min(380px,78vw);display:flex;flex-direction:column;align-items:center;gap:22px}
-.pl-mark{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--faint);letter-spacing:.06em}
-.pl-brand{font-family:var(--serif);font-weight:300;font-size:clamp(34px,5vw,50px);letter-spacing:.52em;margin-right:-.52em}
-.pl-bar{width:100%;height:1px;background:var(--line);position:relative;overflow:hidden}
-.pl-bar i{position:absolute;inset:0;background:linear-gradient(90deg,var(--gold-deep),var(--gold),#efd78c);transform:scaleX(0);transform-origin:left}
-.pl-meta{width:100%;display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--faint)}
-.pl-meta b{font-weight:500;color:var(--gold);font-variant-numeric:tabular-nums lining-nums}
+    <canvas id="webgl" aria-hidden="true"></canvas>
+    <div class="atmos" id="atmos" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
 
-/* ============ Nav + editorial rails ============ */
-.nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:26px 4vw;transition:background .7s,padding .7s,border-color .7s;border-bottom:1px solid transparent}
-.nav.scrolled{padding:15px 4vw;background:rgba(7,7,9,.5);border-bottom-color:var(--hair);-webkit-backdrop-filter:blur(18px) saturate(115%);backdrop-filter:blur(18px) saturate(115%)}
-.logo{font-family:var(--serif);font-size:22px;font-weight:400;letter-spacing:.46em;display:flex;align-items:center;gap:14px}
-.logo-mark{width:8px;height:8px;border:1px solid var(--gold);transform:rotate(45deg);flex:none}
-.nav-links{display:flex;gap:40px;list-style:none}
-.nav-links a{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);position:relative;padding:6px 0;transition:color .4s}
-.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .7s var(--ease)}
-.nav-links a:hover{color:var(--ivory)}
-.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
-.cart-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;min-height:44px;border:1px solid var(--hair);border-radius:999px;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;transition:border-color .4s,background .4s}
-.cart-btn:hover{border-color:rgba(212,175,55,.6);background:rgba(212,175,55,.06)}
-.cart-btn svg{width:15px;height:15px}
-.badge{min-width:19px;height:19px;padding:0 6px;border-radius:999px;background:var(--gold);color:var(--bg);font-size:10px;font-weight:600;letter-spacing:0;display:inline-flex;align-items:center;justify-content:center}
+    <div class="rail rail-l" aria-hidden="true">Maison Aurelia — Paris — Extrait
+      N°07</div>
+    <div class="rail rail-r" aria-hidden="true"><span class="count"
+        id="railCount">01</span><span class="track"><i
+          id="railBar"></i></span><span>05</span></div>
 
-.rail{position:fixed;top:50%;z-index:30;pointer-events:none;font-size:9.5px;letter-spacing:.36em;text-transform:uppercase;color:var(--faint)}
-.rail-l{left:1.6vw;transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl}
-.rail-r{right:1.6vw;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:14px}
-.rail-r .track{width:1px;height:120px;background:var(--line);position:relative;overflow:hidden}
-.rail-r .track i{position:absolute;inset:0;background:var(--gold);transform-origin:top;transform:scaleY(0)}
-.rail-r .count{font-family:var(--serif);font-size:13px;letter-spacing:.12em;color:var(--muted);font-variant-numeric:lining-nums}
+    <div id="callouts" aria-hidden="true">
+      <svg>
+        <polyline id="cl-line-0" points /><polyline id="cl-line-1"
+          points /><polyline id="cl-line-2" points />
+        <circle class="ring" id="cl-ring-0" r="7" cx="0" cy="0" /><circle
+          class="ring" id="cl-ring-1" r="7" cx="0" cy="0" /><circle class="ring"
+          id="cl-ring-2" r="7" cx="0" cy="0" />
+        <circle class="dot" id="cl-dot-0" r="3.2" cx="0" cy="0" /><circle
+          class="dot" id="cl-dot-1" r="3.2" cx="0" cy="0" /><circle class="dot"
+          id="cl-dot-2" r="3.2" cx="0" cy="0" />
+      </svg>
+      <div class="callout panel" id="cl-box-0">
+        <div class="num">01 — FLACON</div>
+        <h3>Hand-Polished French Crystal</h3>
+        <p>A heavy base, cut and polished by hand, that bends light like still
+          water.</p>
+      </div>
+      <div class="callout panel" id="cl-box-1">
+        <div class="num">02 — ATOMIZER</div>
+        <h3>24K Gold Micro-Mist Atomizer</h3>
+        <p>A knurled gold collar and a precision valve that releases a veil
+          finer than fog.</p>
+      </div>
+      <div class="callout panel" id="cl-box-2">
+        <div class="num">03 — ELIXIR</div>
+        <h3>90-Day Cold Maceration</h3>
+        <p>The essences rest in darkness at 12°C for ninety nights before
+          bottling.</p>
+      </div>
+    </div>
 
-/* ============ Shared ============ */
-main{position:relative;z-index:10}
-section{position:relative;z-index:10}
-.kicker{display:inline-flex;align-items:center;gap:14px;font-size:10px;letter-spacing:.36em;text-transform:uppercase;color:var(--gold)}
-.kicker b{font-family:var(--serif);font-weight:400;font-style:italic;font-size:15px;letter-spacing:.04em;text-transform:none}
-.kicker::after{content:"";width:40px;height:1px;background:var(--hair)}
-.sec-title{font-family:var(--serif);font-weight:300;font-size:clamp(38px,4.4vw,70px);line-height:1.02;letter-spacing:-.012em;margin:22px 0 18px}
-.sec-title em{font-style:italic;color:var(--gold);font-weight:300}
-.sec-lead{color:var(--muted);font-size:14.5px;line-height:1.8;max-width:430px;font-weight:300}
-.panel{background:var(--panel);border:1px solid var(--hair);-webkit-backdrop-filter:blur(16px) saturate(115%);backdrop-filter:blur(16px) saturate(115%)}
-.ph{position:relative;overflow:hidden;background:radial-gradient(120% 120% at 30% 20%,#2a2116,#0b0a09 70%)}
-.ph img{width:100%;height:100%;object-fit:cover;transition:transform 1.6s var(--ease-out),opacity 1s ease;opacity:0}
-.ph img.loaded{opacity:1}
-.ph.ph-fail img{display:none}
-.ph::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 90% at 50% 40%,transparent 45%,rgba(5,5,6,.55));box-shadow:inset 0 0 0 1px rgba(212,175,55,.18)}
+    <header class="nav" id="nav">
+      <a href="#hero" class="logo" data-scroll
+        aria-label="Aurelia, back to top"><span
+          class="logo-mark"></span>AURELIA</a>
+      <ul class="nav-links">
+        <li><a href="#notes" data-scroll>Les Notes</a></li>
+        <li><a href="#atelier" data-scroll>L'Atelier</a></li>
+        <li><a href="#craftsmanship" data-scroll>Craftsmanship</a></li>
+        <li><a href="#edition" data-scroll>The Edition</a></li>
+      </ul>
+      <button class="cart-btn" id="cartBtn" aria-label="Open shopping bag"
+        aria-controls="cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.3" aria-hidden="true"><path
+            d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z" /><path
+            d="M9 10V6.5a3 3 0 0 1 6 0V10" /></svg>
+        Bag <span class="badge" id="badge">0</span>
+      </button>
+    </header>
 
-/* ============ Hero ============ */
-.hero{height:100vh;min-height:640px}
-.hero-inner{position:absolute;inset:0;padding:0 5vw}
-.hero .kicker{position:absolute;top:calc(84px + 7vh);left:5vw}
-.hl{font-family:var(--serif);font-weight:300;font-size:clamp(44px,5.5vw,112px);line-height:.93;letter-spacing:-.015em;position:absolute;text-transform:uppercase}
-.hl .line{display:block;overflow:hidden;padding-bottom:.07em}
-.hl .word{display:inline-block;will-change:transform}
-.hl-1{top:27vh;left:5vw}
-.hl-2{bottom:24vh;right:5vw;text-align:right}
-.hl-2 em{font-style:italic;color:var(--gold);text-transform:none}
-.hero-foot{position:absolute;left:5vw;right:5vw;bottom:5.5vh;display:flex;justify-content:space-between;align-items:flex-end;gap:30px}
-.hero-copy{max-width:320px;font-size:13px;line-height:1.8;color:var(--muted);font-weight:300}
-.cta{display:inline-flex;align-items:center;gap:16px;margin-top:22px;padding:16px 26px;min-height:48px;border:1px solid rgba(212,175,55,.5);border-radius:999px;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;position:relative;overflow:hidden;isolation:isolate;transition:color .6s var(--ease),border-color .6s}
-.cta::before{content:"";position:absolute;inset:0;background:var(--gold);transform:translateY(101%);transition:transform .7s var(--ease);z-index:-1}
-.cta:hover{color:var(--bg);border-color:var(--gold)}
-.cta:hover::before{transform:none}
-.cta svg{width:13px;height:13px}
-.scroll-hint{display:flex;flex-direction:column;align-items:center;gap:12px;font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--faint)}
-.scroll-hint i{width:1px;height:56px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
-.scroll-hint i::after{content:"";position:absolute;left:0;top:-30%;width:1px;height:30%;background:var(--ivory);animation:drip 2.4s var(--ease) infinite}
-@keyframes drip{to{top:110%}}
-.hero-meta{text-align:right;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);line-height:2.1}
-.hero-meta b{color:var(--ivory);font-weight:500}
+    <main id="main">
+      <!-- 01 HERO -->
+      <section class="hero" id="hero" data-index="01">
+        <div class="hero-inner">
+          <div class="kicker"><b>N°01</b> Extrait de Parfum — Paris</div>
+          <h1 class="hl hl-1" aria-label="Crafted in shadow.">
+            <span class="line"><span class="word">Crafted</span></span>
+            <span class="line"><span class="word">in</span> <span
+                class="word">Shadow.</span></span>
+          </h1>
+          <p class="hl hl-2" aria-label="Worn in light.">
+            <span class="line"><span class="word">Worn</span></span>
+            <span class="line"><span class="word">in</span> <span
+                class="word"><em>Light.</em></span></span>
+          </p>
+          <div class="hero-foot">
+            <div>
+              <p class="hero-copy">Amber resin, smoked iris and aged oud,
+                cold-macerated for ninety nights and sealed in hand-polished
+                crystal.</p>
+              <a href="#notes" class="cta" data-scroll>Discover the Scent
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                  stroke-width="1.3" aria-hidden="true"><path
+                    d="M8 2v12M3 9l5 5 5-5" /></svg>
+              </a>
+            </div>
+            <div class="scroll-hint"><i></i>Scroll</div>
+            <div class="hero-meta">Edition <b>N° 07</b><br>Concentration
+              <b>28%</b><br>Sillage <b>Enveloping</b></div>
+          </div>
+        </div>
+      </section>
 
-/* ============ Notes ============ */
-.notes{min-height:120vh;padding:20vh 5vw 14vh}
-.notes-grid{display:grid;grid-template-columns:minmax(0,600px) 1fr;gap:4vw}
-.notes-cards{display:flex;flex-direction:column;gap:14px;margin-top:42px}
-.note-card{border-radius:16px;padding:14px 24px 14px 14px;display:grid;grid-template-columns:118px 1fr auto;gap:24px;align-items:center;transition:border-color .6s,background .6s,translate .8s var(--ease-out)}
-.note-card:hover{border-color:rgba(212,175,55,.5);background:rgba(26,22,16,.52);translate:8px 0}
-.note-img{width:118px;height:140px;border-radius:10px}
-.note-card:hover .note-img img{transform:scale(1.12)}
-.note-tier{display:flex;align-items:baseline;gap:12px;font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
-.note-tier span{font-family:var(--serif);font-style:italic;font-size:20px;letter-spacing:0;color:var(--gold);text-transform:none}
-.note-name{font-family:var(--serif);font-size:clamp(23px,1.9vw,29px);font-weight:400;line-height:1.14}
-.note-desc{margin-top:9px;font-size:12.5px;line-height:1.7;color:var(--muted);font-weight:300}
-.note-time{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);white-space:nowrap;align-self:start;padding-top:14px}
+      <!-- 02 NOTES -->
+      <section class="notes" id="notes" data-index="02">
+        <div class="notes-grid">
+          <div>
+            <div class="kicker reveal"><b>N°02</b> The Olfactory Pyramid</div>
+            <h2 class="sec-title reveal">A scent that <em>unfolds</em><br>like
+              nightfall.</h2>
+            <p class="sec-lead reveal">Three movements, written over hours on
+              the skin: a bright citrus opening, a smoky floral heart, and a
+              warm resinous base.</p>
+            <div class="notes-cards">
+              <article class="note-card panel" data-rim="#ffd36e">
+                <div class="ph note-img"><img
+                    src="https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=480&h=560&q=80"
+                    alt="Yellow citrus fruit on a black surface" loading="lazy"
+                    decoding="async"></div>
+                <div>
+                  <div class="note-tier"><span>I.</span>Top Notes</div>
+                  <div class="note-name">Calabrian Bergamot, Pink Pepper</div>
+                  <p class="note-desc">A sparkling, peppery opening, like citrus
+                    zest struck in candlelight.</p>
+                </div>
+                <div class="note-time">0 — 20 min</div>
+              </article>
+              <article class="note-card panel" data-rim="#ff5f8a">
+                <div class="ph note-img"><img
+                    src="https://images.unsplash.com/photo-1748866762090-26f92c581a3f?auto=format&fit=crop&w=480&h=560&q=80"
+                    alt="A wild rose blooming in darkness" loading="lazy"
+                    decoding="async"></div>
+                <div>
+                  <div class="note-tier"><span>II.</span>Heart Notes</div>
+                  <div class="note-name">Damask Rose, Smoked Iris</div>
+                  <p class="note-desc">Velvet petals drawn through cool, powdery
+                    smoke.</p>
+                </div>
+                <div class="note-time">20 min — 4 h</div>
+              </article>
+              <article class="note-card panel" data-rim="#c48a3f">
+                <div class="ph note-img"><img
+                    src="https://images.unsplash.com/photo-1682482198446-4cbf92f85a4b?auto=format&fit=crop&w=480&h=560&q=80"
+                    alt="A bundle of cured vanilla pods on dark wood"
+                    loading="lazy" decoding="async"></div>
+                <div>
+                  <div class="note-tier"><span>III.</span>Base Notes</div>
+                  <div class="note-name">Aged Oud, Madagascar Vanilla,
+                    Ambergris</div>
+                  <p class="note-desc">A deep, resinous trail that lingers long
+                    after you leave the room.</p>
+                </div>
+                <div class="note-time">4 h — 12 h+</div>
+              </article>
+            </div>
+          </div>
+          <div></div>
+        </div>
+      </section>
 
-/* ============ Atelier editorial split ============ */
-.atelier{min-height:115vh;padding:16vh 5vw 12vh;display:grid;grid-template-columns:minmax(0,34vw) minmax(0,25vw) 1fr;gap:4.5vw;align-items:center}
-.frame{position:relative;padding:14px;border:1px solid var(--hair);border-radius:999px 999px 6px 6px}
-.frame::before{content:"";position:absolute;inset:5px;border:1px solid rgba(212,175,55,.12);border-radius:999px 999px 4px 4px;pointer-events:none}
-.frame .ph{aspect-ratio:3/4.1;border-radius:999px 999px 4px 4px}
-.frame .ph img{position:absolute;inset:-12% 0;height:124%;filter:saturate(.82) contrast(1.06) brightness(.86) sepia(.12)}
-.frame-cap{display:flex;justify-content:space-between;margin-top:16px;font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint)}
-.frame-cap em{font-family:var(--serif);font-size:14px;letter-spacing:.02em;text-transform:none;color:var(--muted)}
-.quote{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(22px,1.8vw,28px);line-height:1.35;color:var(--ivory);margin:28px 0 22px;padding-left:22px;border-left:1px solid var(--hair)}
-.sig{font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--faint)}
-.atelier .sec-title{font-size:clamp(34px,3.3vw,54px)}
-.atelier-specs{margin-top:34px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--hair)}
-.atelier-specs div{padding:16px 0;border-bottom:1px solid var(--hair)}
-.atelier-specs div:nth-child(odd){padding-right:16px;border-right:1px solid var(--hair)}
-.atelier-specs div:nth-child(even){padding-left:16px}
-.atelier-specs b{display:block;font-family:var(--serif);font-weight:300;font-size:30px;line-height:1}
-.atelier-specs span{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--faint)}
-
-/* ============ Craftsmanship (exploded) ============ */
-.craft{height:160vh}
-.craft-sticky{position:sticky;top:0;height:100vh;padding:calc(96px + 6vh) 5vw 7vh;pointer-events:none}
-.craft-head{max-width:min(420px,34vw)}
-.craft-head .sec-title{font-size:clamp(36px,3.8vw,60px)}
-.spray-btn{
-  pointer-events:auto;display:inline-flex;align-items:center;gap:14px;margin-top:26px;padding:14px 22px 14px 16px;min-height:48px;
-  border:1px solid var(--hair);border-radius:999px;font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--ivory);
-  transition:border-color .5s,background .5s;
-}
-.spray-btn:hover{border-color:rgba(212,175,55,.65);background:rgba(212,175,55,.07)}
-.spray-btn .ico{width:28px;height:28px;border-radius:50%;border:1px solid var(--hair);display:inline-flex;align-items:center;justify-content:center}
-.spray-btn svg{width:14px;height:14px}
-.spray-btn.firing .ico{animation:ping .9s var(--ease-out)}
-@keyframes ping{0%{box-shadow:0 0 0 0 rgba(212,175,55,.55)}100%{box-shadow:0 0 0 16px rgba(212,175,55,0)}}
-
-#callouts{position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;visibility:hidden}
-#callouts svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-#callouts polyline{fill:none;stroke:rgba(212,175,55,.7);stroke-width:1}
-#callouts .dot{fill:var(--gold)}
-#callouts .ring{fill:none;stroke:var(--gold);stroke-width:1;transform-box:fill-box;transform-origin:center;animation:pulse 2.6s ease-out infinite}
-@keyframes pulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(2.6);opacity:0}}
-.callout{position:absolute;left:0;top:0;width:min(240px,40vw);padding:15px 17px;border-radius:12px;will-change:transform}
-.callout .num{font-size:9.5px;letter-spacing:.32em;color:var(--gold)}
-.callout h3{font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.15;margin:6px 0}
-.callout p{font-size:11.5px;line-height:1.6;color:var(--muted);font-weight:300}
-
-/* ============ Edition / configurator ============ */
-.edition{min-height:100vh;padding:16vh 5vw 10vh;display:grid;grid-template-columns:1fr minmax(0,490px);align-items:center;gap:4vw}
-.config{border-radius:22px;padding:38px 38px 32px}
-.config .sec-title{font-size:clamp(34px,3.2vw,50px);margin:16px 0 4px}
-.ed-name{font-family:var(--serif);font-style:italic;font-size:21px;color:var(--gold)}
-.ed-desc{font-size:13px;line-height:1.75;color:var(--muted);margin:12px 0 26px;min-height:46px;font-weight:300}
-.opt-label{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
-.opt-label span:last-child{color:var(--ivory)}
-.ed-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
-.ed-opt{border:1px solid var(--line);border-radius:12px;padding:14px 8px 12px;min-height:44px;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:11.5px;color:var(--muted);transition:border-color .4s,color .4s,background .4s}
-.ed-opt .sw{width:26px;height:26px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);transition:box-shadow .5s}
-.ed-opt:hover{border-color:rgba(255,255,255,.22);color:var(--ivory)}
-.ed-opt[aria-pressed="true"]{border-color:var(--gold);color:var(--ivory);background:rgba(212,175,55,.06)}
-.ed-opt[aria-pressed="true"] .sw{box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),0 0 0 4px rgba(212,175,55,.16)}
-.size-toggle{position:relative;display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--hair);border-radius:999px;padding:4px;margin-bottom:28px}
-.size-toggle .pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--ivory);transition:transform .8s var(--ease)}
-.size-toggle[data-size="100"] .pill{transform:translateX(100%)}
-.size-opt{position:relative;z-index:1;padding:13px 8px;min-height:44px;border-radius:999px;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);transition:color .5s}
-.size-opt[aria-pressed="true"]{color:var(--bg);font-weight:600}
-.buy-row{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding-top:24px;border-top:1px solid var(--hair)}
-.price{font-family:var(--serif);font-weight:300;font-size:52px;line-height:1;font-variant-numeric:tabular-nums lining-nums}
-.price-note{font-size:10.5px;color:var(--faint);margin-top:8px;letter-spacing:.04em}
-.btn-gold{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:18px 28px;min-height:52px;border-radius:999px;background:linear-gradient(135deg,#e7c86a,var(--gold) 45%,var(--gold-deep));color:#120e05;font-size:10.5px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;white-space:nowrap;box-shadow:0 12px 40px -14px rgba(212,175,55,.55);transition:transform .6s var(--ease-out),box-shadow .6s}
-.btn-gold::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg);transition:left 1s var(--ease)}
-.btn-gold:hover{transform:translateY(-2px);box-shadow:0 18px 50px -14px rgba(212,175,55,.7)}
-.btn-gold:hover::after{left:130%}
-.btn-gold:disabled{opacity:.55;cursor:not-allowed}
-.config-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:20px;flex-wrap:wrap}
-.config-foot .spray-btn{margin-top:0;padding:10px 18px 10px 10px;min-height:44px;font-size:9.5px}
-.perks{display:flex;gap:18px;flex-wrap:wrap;font-size:10.5px;color:var(--faint);letter-spacing:.04em}
-.perks span{display:inline-flex;align-items:center;gap:8px}
-.perks span::before{content:"";width:5px;height:5px;border:1px solid var(--gold);transform:rotate(45deg)}
-
-/* ============ Footer ============ */
-.footer{position:relative;z-index:10;padding:10vh 5vw 6vh;border-top:1px solid var(--hair);display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;background:linear-gradient(transparent,rgba(7,7,9,.9))}
-.footer .logo{font-size:32px}
-.footer p{font-size:12px;color:var(--faint);line-height:1.8;max-width:340px;margin-top:16px}
-.footer small{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint)}
-.credits{font-size:10px;color:var(--faint);letter-spacing:.06em}
-.credits a{border-bottom:1px solid var(--hair)}
-
-/* ============ Cart drawer ============ */
-.scrim{position:fixed;inset:0;z-index:80;background:rgba(3,3,4,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .6s}
-.scrim.open{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;right:0;bottom:0;z-index:90;width:min(440px,100%);display:flex;flex-direction:column;background:rgba(11,10,10,.95);border-left:1px solid var(--hair);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transform:translateX(102%);transition:transform .8s var(--ease),visibility 0s .8s;visibility:hidden}
-.drawer.open{transform:none;visibility:visible;transition:transform .8s var(--ease),visibility 0s}
-.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:26px 28px;border-bottom:1px solid var(--hair)}
-.drawer-head h2{font-family:var(--serif);font-weight:400;font-size:28px}
-.drawer-head h2 span{font-family:var(--sans);font-size:10px;color:var(--faint);letter-spacing:.22em;margin-left:10px;vertical-align:middle}
-.icon-btn{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--hair);border-radius:50%;transition:border-color .4s,transform .7s var(--ease)}
-.icon-btn:hover{border-color:var(--gold);transform:rotate(90deg)}
-.icon-btn svg{width:14px;height:14px}
-.drawer-body{flex:1;overflow-y:auto;padding:8px 28px}
-.empty{height:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;color:var(--muted)}
-.empty .logo-mark{width:13px;height:13px}
-.empty h3{font-family:var(--serif);font-weight:400;font-size:26px;color:var(--ivory)}
-.empty p{font-size:12.5px;max-width:240px;line-height:1.6}
-.item{display:grid;grid-template-columns:64px 1fr auto;gap:16px;padding:22px 0;border-bottom:1px solid var(--hair);align-items:center}
-.item-thumb{width:64px;height:80px;border-radius:10px;border:1px solid var(--hair);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;background:linear-gradient(160deg,rgba(255,255,255,.05),transparent)}
-.item-thumb i{width:30px;height:38px;border-radius:7px 7px 5px 5px;box-shadow:0 0 16px currentColor,inset 0 0 0 1px rgba(255,255,255,.3)}
-.item h4{font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.1}
-.item .meta{font-size:10px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:5px}
-.qty{display:inline-flex;align-items:center;border:1px solid var(--hair);border-radius:999px;margin-top:12px}
-.qty button{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);transition:color .3s}
-.qty button:hover{color:var(--gold)}
-.qty span{min-width:22px;text-align:center;font-size:13px;font-variant-numeric:tabular-nums}
-.item-right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
-.item-price{font-family:var(--serif);font-size:22px;font-variant-numeric:tabular-nums lining-nums}
-.remove{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid transparent;padding:6px 0;transition:color .3s,border-color .3s}
-.remove:hover{color:var(--ivory);border-color:var(--gold)}
-.drawer-foot{padding:24px 28px 28px;border-top:1px solid var(--hair)}
-.row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:10px}
-.row.total{color:var(--ivory);font-size:13.5px;margin:16px 0 20px;align-items:baseline}
-.row.total b{font-family:var(--serif);font-weight:400;font-size:32px;font-variant-numeric:tabular-nums lining-nums}
-.drawer-foot .btn-gold{width:100%}
-.secure{text-align:center;font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin-top:14px}
-
-.toast{position:fixed;left:50%;bottom:32px;z-index:120;transform:translateX(-50%);opacity:0;pointer-events:none;display:flex;align-items:center;gap:16px;padding:16px 22px 16px 16px;border-radius:16px;min-width:min(420px,92vw);background:rgba(14,13,12,.92);border:1px solid rgba(212,175,55,.35);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
-.toast-icon{width:40px;height:40px;border-radius:50%;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center;flex:none}
-.toast-icon svg{width:16px;height:16px}
-.toast b{display:block;font-family:var(--serif);font-weight:500;font-size:20px}
-.toast span{font-size:12px;color:var(--muted)}
-
-/* ============ Responsive ============ */
-@media (max-width:1100px){.rail{display:none}}
-@media (max-width:960px){
-  .nav-links{display:none}
-  .notes-grid{grid-template-columns:1fr}
-  .notes{padding-top:46vh}
-  .atelier{grid-template-columns:1fr;padding-top:50vh;gap:40px}
-  .frame{max-width:420px}
-  .craft-head{max-width:none}
-  .edition{grid-template-columns:1fr;padding-top:52vh}
-  .config{padding:28px 22px 24px}
-}
-@media (max-width:640px){
-  .hl{font-size:clamp(38px,11vw,58px)}
-  .hl-1{top:20vh}.hl-2{bottom:27vh}
-  .hero-foot{flex-direction:column;align-items:flex-start}
-  .hero-meta,.scroll-hint{display:none}
-  .hero .kicker{top:96px}
-  .note-card{grid-template-columns:84px 1fr;gap:16px}
-  .note-img{width:84px;height:104px}
-  .note-time{display:none}
-  .buy-row{flex-direction:column;align-items:stretch}
-  .btn-gold{width:100%}
-  .callout{width:min(180px,44vw);padding:11px 13px}
-  .callout h3{font-size:16px}
-  .callout p{display:none}
-}
-@media (prefers-reduced-motion:reduce){.grain,.scroll-hint i::after,#callouts .ring{animation:none}}
-</style>
-</head>
-<body class="is-loading">
-
-<div id="preloader" aria-live="polite">
-  <div class="pl-inner">
-    <div class="pl-mark">Maison fondée à Paris</div>
-    <div class="pl-brand">AURELIA</div>
-    <div class="pl-bar"><i id="plBar"></i></div>
-    <div class="pl-meta"><span>Macération</span><b><span id="plNum">0</span>%</b></div>
-  </div>
-</div>
-
-<canvas id="webgl" aria-hidden="true"></canvas>
-<div class="atmos" id="atmos" aria-hidden="true"></div>
-<div class="vignette" aria-hidden="true"></div>
-<div class="grain" aria-hidden="true"></div>
-
-<div class="rail rail-l" aria-hidden="true">Maison Aurelia — Paris — Extrait N°07</div>
-<div class="rail rail-r" aria-hidden="true"><span class="count" id="railCount">01</span><span class="track"><i id="railBar"></i></span><span>05</span></div>
-
-<div id="callouts" aria-hidden="true">
-  <svg>
-    <polyline id="cl-line-0" points=""/><polyline id="cl-line-1" points=""/><polyline id="cl-line-2" points=""/>
-    <circle class="ring" id="cl-ring-0" r="7" cx="0" cy="0"/><circle class="ring" id="cl-ring-1" r="7" cx="0" cy="0"/><circle class="ring" id="cl-ring-2" r="7" cx="0" cy="0"/>
-    <circle class="dot" id="cl-dot-0" r="3.2" cx="0" cy="0"/><circle class="dot" id="cl-dot-1" r="3.2" cx="0" cy="0"/><circle class="dot" id="cl-dot-2" r="3.2" cx="0" cy="0"/>
-  </svg>
-  <div class="callout panel" id="cl-box-0">
-    <div class="num">01 — FLACON</div>
-    <h3>Hand-Polished French Crystal</h3>
-    <p>A heavy base, cut and polished by hand, that bends light like still water.</p>
-  </div>
-  <div class="callout panel" id="cl-box-1">
-    <div class="num">02 — ATOMIZER</div>
-    <h3>24K Gold Micro-Mist Atomizer</h3>
-    <p>A knurled gold collar and a precision valve that releases a veil finer than fog.</p>
-  </div>
-  <div class="callout panel" id="cl-box-2">
-    <div class="num">03 — ELIXIR</div>
-    <h3>90-Day Cold Maceration</h3>
-    <p>The essences rest in darkness at 12°C for ninety nights before bottling.</p>
-  </div>
-</div>
-
-<header class="nav" id="nav">
-  <a href="#hero" class="logo" data-scroll aria-label="Aurelia, back to top"><span class="logo-mark"></span>AURELIA</a>
-  <ul class="nav-links">
-    <li><a href="#notes" data-scroll>Les Notes</a></li>
-    <li><a href="#atelier" data-scroll>L'Atelier</a></li>
-    <li><a href="#craftsmanship" data-scroll>Craftsmanship</a></li>
-    <li><a href="#edition" data-scroll>The Edition</a></li>
-  </ul>
-  <button class="cart-btn" id="cartBtn" aria-label="Open shopping bag" aria-controls="cart">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>
-    Bag <span class="badge" id="badge">0</span>
-  </button>
-</header>
-
-<main id="main">
-  <!-- 01 HERO -->
-  <section class="hero" id="hero" data-index="01">
-    <div class="hero-inner">
-      <div class="kicker"><b>N°01</b> Extrait de Parfum — Paris</div>
-      <h1 class="hl hl-1" aria-label="Crafted in shadow.">
-        <span class="line"><span class="word">Crafted</span></span>
-        <span class="line"><span class="word">in</span> <span class="word">Shadow.</span></span>
-      </h1>
-      <p class="hl hl-2" aria-label="Worn in light.">
-        <span class="line"><span class="word">Worn</span></span>
-        <span class="line"><span class="word">in</span> <span class="word"><em>Light.</em></span></span>
-      </p>
-      <div class="hero-foot">
+      <!-- 03 ATELIER (editorial split) -->
+      <section class="atelier" id="atelier" data-index="03">
+        <figure class="reveal">
+          <div class="frame">
+            <div class="ph" id="atelierPh"><img id="atelierImg"
+                src="https://images.unsplash.com/photo-1709662369877-187c3420cc7d?auto=format&fit=crop&w=1400&q=80"
+                alt="A perfumer's dropper releasing golden liquid into a crystal bottle"
+                loading="lazy" decoding="async"></div>
+          </div>
+          <figcaption class="frame-cap"><span>Plate III</span><em>The final
+              dosage, measured by hand</em></figcaption>
+        </figure>
         <div>
-          <p class="hero-copy">Amber resin, smoked iris and aged oud, cold-macerated for ninety nights and sealed in hand-polished crystal.</p>
-          <a href="#notes" class="cta" data-scroll>Discover the Scent
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M8 2v12M3 9l5 5 5-5"/></svg>
-          </a>
+          <div class="kicker reveal"><b>N°03</b> L'Atelier</div>
+          <h2 class="sec-title reveal">Composed by hand,<br><em>measured in
+              drops.</em></h2>
+          <p class="sec-lead reveal">Every flacon is filled at the bench, one
+            pipette at a time. Nothing is rushed: the blend is weighed, rested
+            and weighed again before it is sealed.</p>
+          <blockquote
+            class="quote reveal">"A perfume is finished when it can no longer be explained, only remembered."</blockquote>
+          <div class="sig reveal">— Carnet de l'Atelier, Paris</div>
+          <div class="atelier-specs reveal">
+            <div><b>112</b><span>Raw materials</span></div>
+            <div><b>28%</b><span>Concentration</span></div>
+            <div><b>90</b><span>Nights of rest</span></div>
+            <div><b>1</b><span>Hand, one flacon</span></div>
+          </div>
         </div>
-        <div class="scroll-hint"><i></i>Scroll</div>
-        <div class="hero-meta">Edition <b>N° 07</b><br>Concentration <b>28%</b><br>Sillage <b>Enveloping</b></div>
-      </div>
-    </div>
-  </section>
+        <div></div>
+      </section>
 
-  <!-- 02 NOTES -->
-  <section class="notes" id="notes" data-index="02">
-    <div class="notes-grid">
-      <div>
-        <div class="kicker reveal"><b>N°02</b> The Olfactory Pyramid</div>
-        <h2 class="sec-title reveal">A scent that <em>unfolds</em><br>like nightfall.</h2>
-        <p class="sec-lead reveal">Three movements, written over hours on the skin: a bright citrus opening, a smoky floral heart, and a warm resinous base.</p>
-        <div class="notes-cards">
-          <article class="note-card panel" data-rim="#ffd36e">
-            <div class="ph note-img"><img src="https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=480&h=560&q=80" alt="Yellow citrus fruit on a black surface" loading="lazy" decoding="async"></div>
-            <div>
-              <div class="note-tier"><span>I.</span>Top Notes</div>
-              <div class="note-name">Calabrian Bergamot, Pink Pepper</div>
-              <p class="note-desc">A sparkling, peppery opening, like citrus zest struck in candlelight.</p>
-            </div>
-            <div class="note-time">0 — 20 min</div>
-          </article>
-          <article class="note-card panel" data-rim="#ff5f8a">
-            <div class="ph note-img"><img src="https://images.unsplash.com/photo-1748866762090-26f92c581a3f?auto=format&fit=crop&w=480&h=560&q=80" alt="A wild rose blooming in darkness" loading="lazy" decoding="async"></div>
-            <div>
-              <div class="note-tier"><span>II.</span>Heart Notes</div>
-              <div class="note-name">Damask Rose, Smoked Iris</div>
-              <p class="note-desc">Velvet petals drawn through cool, powdery smoke.</p>
-            </div>
-            <div class="note-time">20 min — 4 h</div>
-          </article>
-          <article class="note-card panel" data-rim="#c48a3f">
-            <div class="ph note-img"><img src="https://images.unsplash.com/photo-1682482198446-4cbf92f85a4b?auto=format&fit=crop&w=480&h=560&q=80" alt="A bundle of cured vanilla pods on dark wood" loading="lazy" decoding="async"></div>
-            <div>
-              <div class="note-tier"><span>III.</span>Base Notes</div>
-              <div class="note-name">Aged Oud, Madagascar Vanilla, Ambergris</div>
-              <p class="note-desc">A deep, resinous trail that lingers long after you leave the room.</p>
-            </div>
-            <div class="note-time">4 h — 12 h+</div>
-          </article>
+      <!-- 04 CRAFTSMANSHIP (exploded + spray) -->
+      <section class="craft" id="craftsmanship" data-index="04">
+        <div class="craft-sticky">
+          <div class="craft-head">
+            <div class="kicker reveal"><b>N°04</b> Craftsmanship</div>
+            <h2 class="sec-title reveal">The anatomy<br>of an
+              <em>heirloom.</em></h2>
+            <p class="sec-lead reveal">Lift the magnetic cap and the atomizer
+              answers with a single veil of mist.</p>
+            <button class="spray-btn reveal" data-spray
+              aria-label="Spray mist from the bottle">
+              <span class="ico"><svg viewBox="0 0 16 16" fill="none"
+                  stroke="currentColor" stroke-width="1.2"
+                  aria-hidden="true"><circle cx="4" cy="8" r="1.6" /><path
+                    d="M8 8h1.5M11 5.5l1.4-.8M11 10.5l1.4.8M12 8h2" /></svg></span>
+              Spray Mist
+            </button>
+          </div>
         </div>
-      </div>
-      <div></div>
-    </div>
-  </section>
+      </section>
 
-  <!-- 03 ATELIER (editorial split) -->
-  <section class="atelier" id="atelier" data-index="03">
-    <figure class="reveal">
-      <div class="frame">
-        <div class="ph" id="atelierPh"><img id="atelierImg" src="https://images.unsplash.com/photo-1709662369877-187c3420cc7d?auto=format&fit=crop&w=1400&q=80" alt="A perfumer's dropper releasing golden liquid into a crystal bottle" loading="lazy" decoding="async"></div>
-      </div>
-      <figcaption class="frame-cap"><span>Plate III</span><em>The final dosage, measured by hand</em></figcaption>
-    </figure>
-    <div>
-      <div class="kicker reveal"><b>N°03</b> L'Atelier</div>
-      <h2 class="sec-title reveal">Composed by hand,<br><em>measured in drops.</em></h2>
-      <p class="sec-lead reveal">Every flacon is filled at the bench, one pipette at a time. Nothing is rushed: the blend is weighed, rested and weighed again before it is sealed.</p>
-      <blockquote class="quote reveal">"A perfume is finished when it can no longer be explained, only remembered."</blockquote>
-      <div class="sig reveal">— Carnet de l'Atelier, Paris</div>
-      <div class="atelier-specs reveal">
-        <div><b>112</b><span>Raw materials</span></div>
-        <div><b>28%</b><span>Concentration</span></div>
-        <div><b>90</b><span>Nights of rest</span></div>
-        <div><b>1</b><span>Hand, one flacon</span></div>
-      </div>
-    </div>
-    <div></div>
-  </section>
+      <!-- 05 EDITION -->
+      <section class="edition" id="edition" data-index="05">
+        <div></div>
+        <div class="config panel reveal" id="config">
+          <div class="kicker"><b>N°05</b> Compose your Edition</div>
+          <h2 class="sec-title">L'Élixir Nocturne</h2>
+          <div class="ed-name" id="edName">Nocturne Amber</div>
+          <p class="ed-desc" id="edDesc">The signature: liquid gold of amber
+            resin, warm vanilla and a whisper of smoked iris.</p>
 
-  <!-- 04 CRAFTSMANSHIP (exploded + spray) -->
-  <section class="craft" id="craftsmanship" data-index="04">
-    <div class="craft-sticky">
-      <div class="craft-head">
-        <div class="kicker reveal"><b>N°04</b> Craftsmanship</div>
-        <h2 class="sec-title reveal">The anatomy<br>of an <em>heirloom.</em></h2>
-        <p class="sec-lead reveal">Lift the magnetic cap and the atomizer answers with a single veil of mist.</p>
-        <button class="spray-btn reveal" data-spray aria-label="Spray mist from the bottle">
-          <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="4" cy="8" r="1.6"/><path d="M8 8h1.5M11 5.5l1.4-.8M11 10.5l1.4.8M12 8h2"/></svg></span>
-          Spray Mist
-        </button>
-      </div>
-    </div>
-  </section>
+          <div class="opt-label"><span>Scent Edition</span><span
+              id="edLabel">Nocturne Amber</span></div>
+          <div class="ed-options" role="group" aria-label="Scent edition">
+            <button class="ed-opt" data-edition="amber"
+              aria-pressed="true"><span class="sw"
+                style="background:radial-gradient(circle at 35% 30%,#f6dc8a,#D4AF37 45%,#7d5406)"></span>Nocturne
+              Amber</button>
+            <button class="ed-opt" data-edition="rose"
+              aria-pressed="false"><span class="sw"
+                style="background:radial-gradient(circle at 35% 30%,#f3a0b6,#b02e55 45%,#4f0d22)"></span>Velvet
+              Rose</button>
+            <button class="ed-opt" data-edition="oud" aria-pressed="false"><span
+                class="sw"
+                style="background:radial-gradient(circle at 35% 30%,#a7774a,#4a2616 45%,#120806)"></span>Obsidian
+              Oud</button>
+          </div>
 
-  <!-- 05 EDITION -->
-  <section class="edition" id="edition" data-index="05">
-    <div></div>
-    <div class="config panel reveal" id="config">
-      <div class="kicker"><b>N°05</b> Compose your Edition</div>
-      <h2 class="sec-title">L'Élixir Nocturne</h2>
-      <div class="ed-name" id="edName">Nocturne Amber</div>
-      <p class="ed-desc" id="edDesc">The signature: liquid gold of amber resin, warm vanilla and a whisper of smoked iris.</p>
+          <div class="opt-label"><span>Flacon Size</span><span
+              id="sizeLabel">100 ML</span></div>
+          <div class="size-toggle" id="sizeToggle" data-size="100" role="group"
+            aria-label="Flacon size">
+            <span class="pill" aria-hidden="true"></span>
+            <button class="size-opt" data-size="50" aria-pressed="false">50 ML —
+              $210</button>
+            <button class="size-opt" data-size="100" aria-pressed="true">100 ML
+              — $320</button>
+          </div>
 
-      <div class="opt-label"><span>Scent Edition</span><span id="edLabel">Nocturne Amber</span></div>
-      <div class="ed-options" role="group" aria-label="Scent edition">
-        <button class="ed-opt" data-edition="amber" aria-pressed="true"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#f6dc8a,#D4AF37 45%,#7d5406)"></span>Nocturne Amber</button>
-        <button class="ed-opt" data-edition="rose" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#f3a0b6,#b02e55 45%,#4f0d22)"></span>Velvet Rose</button>
-        <button class="ed-opt" data-edition="oud" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#a7774a,#4a2616 45%,#120806)"></span>Obsidian Oud</button>
-      </div>
+          <div class="buy-row">
+            <div>
+              <div class="price" id="price">$320</div>
+              <div class="price-note">Complimentary engraving &amp; gift
+                coffret</div>
+            </div>
+            <button class="btn-gold" id="addBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.7"
+                aria-hidden="true"><path
+                  d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z" /><path
+                  d="M9 10V6.5a3 3 0 0 1 6 0V10" /></svg>
+              <span>Add to Bag</span>
+            </button>
+          </div>
+          <div class="config-foot">
+            <button class="spray-btn" data-spray
+              aria-label="Test spray the bottle">
+              <span class="ico"><svg viewBox="0 0 16 16" fill="none"
+                  stroke="currentColor" stroke-width="1.2"
+                  aria-hidden="true"><circle cx="4" cy="8" r="1.6" /><path
+                    d="M8 8h1.5M11 5.5l1.4-.8M11 10.5l1.4.8M12 8h2" /></svg></span>
+              Test Spray
+            </button>
+            <div class="perks"><span>Express delivery</span><span>Samples
+                included</span></div>
+          </div>
+        </div>
+      </section>
 
-      <div class="opt-label"><span>Flacon Size</span><span id="sizeLabel">100 ML</span></div>
-      <div class="size-toggle" id="sizeToggle" data-size="100" role="group" aria-label="Flacon size">
-        <span class="pill" aria-hidden="true"></span>
-        <button class="size-opt" data-size="50" aria-pressed="false">50 ML — $210</button>
-        <button class="size-opt" data-size="100" aria-pressed="true">100 ML — $320</button>
-      </div>
-
-      <div class="buy-row">
+      <footer class="footer">
         <div>
-          <div class="price" id="price">$320</div>
-          <div class="price-note">Complimentary engraving &amp; gift coffret</div>
+          <div class="logo"><span class="logo-mark"></span>AURELIA</div>
+          <p>Haute parfumerie, composed in Paris. A fictional maison; the flacon
+            is rendered entirely in code.</p>
         </div>
-        <button class="btn-gold" id="addBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>
-          <span>Add to Bag</span>
-        </button>
+        <div style="text-align:right">
+          <div class="credits">Photography via <a href="https://unsplash.com"
+              target="_blank" rel="noopener">Unsplash</a> — Thitiphum
+            Koonjantuek, Wolfgang Vrede, sidath vimukthi, Fulvio Ciccolo, Annie
+            Spratt</div>
+          <small style="display:block;margin-top:12px">© 2026 Maison
+            Aurelia</small>
+        </div>
+      </footer>
+    </main>
+
+    <div class="scrim" id="scrim"></div>
+    <aside class="drawer" id="cart" aria-label="Shopping bag" aria-hidden="true"
+      data-lenis-prevent>
+      <div class="drawer-head">
+        <h2>Your Bag <span id="drawerCount">0 ITEMS</span></h2>
+        <button class="icon-btn" id="closeCart" aria-label="Close bag"><svg
+            viewBox="0 0 16 16" fill="none" stroke="currentColor"
+            stroke-width="1.3" aria-hidden="true"><path
+              d="M3 3l10 10M13 3L3 13" /></svg></button>
       </div>
-      <div class="config-foot">
-        <button class="spray-btn" data-spray aria-label="Test spray the bottle">
-          <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="4" cy="8" r="1.6"/><path d="M8 8h1.5M11 5.5l1.4-.8M11 10.5l1.4.8M12 8h2"/></svg></span>
-          Test Spray
-        </button>
-        <div class="perks"><span>Express delivery</span><span>Samples included</span></div>
+      <div class="drawer-body" id="cartItems" data-lenis-prevent></div>
+      <div class="drawer-foot">
+        <div class="row"><span>Shipping</span><span>Complimentary</span></div>
+        <div class="row"><span>Engraving &amp;
+            coffret</span><span>Included</span></div>
+        <div class="row total"><span>Subtotal</span><b
+            id="subtotal">$0</b></div>
+        <button class="btn-gold" id="checkoutBtn"><span>Proceed to
+            Checkout</span></button>
+        <div class="secure">Simulated checkout · No payment taken</div>
       </div>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <div class="toast-icon"><svg viewBox="0 0 16 16" fill="none"
+          stroke="currentColor" stroke-width="2" aria-hidden="true"><path
+            d="M3 8.5l3.2 3L13 4.5" /></svg></div>
+      <div><b id="toastTitle">Merci.</b><span id="toastMsg">Your order is
+          confirmed.</span></div>
     </div>
-  </section>
 
-  <footer class="footer">
-    <div>
-      <div class="logo"><span class="logo-mark"></span>AURELIA</div>
-      <p>Haute parfumerie, composed in Paris. A fictional maison; the flacon is rendered entirely in code.</p>
-    </div>
-    <div style="text-align:right">
-      <div class="credits">Photography via <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> — Thitiphum Koonjantuek, Wolfgang Vrede, sidath vimukthi, Fulvio Ciccolo, Annie Spratt</div>
-      <small style="display:block;margin-top:12px">© 2026 Maison Aurelia</small>
-    </div>
-  </footer>
-</main>
+    <noscript><div
+        style="position:fixed;inset:0;z-index:400;background:#070709;color:#F5F2EB;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:22px">Please
+        enable JavaScript to experience AURELIA.</div></noscript>
 
-<div class="scrim" id="scrim"></div>
-<aside class="drawer" id="cart" aria-label="Shopping bag" aria-hidden="true" data-lenis-prevent>
-  <div class="drawer-head">
-    <h2>Your Bag <span id="drawerCount">0 ITEMS</span></h2>
-    <button class="icon-btn" id="closeCart" aria-label="Close bag"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg></button>
-  </div>
-  <div class="drawer-body" id="cartItems" data-lenis-prevent></div>
-  <div class="drawer-foot">
-    <div class="row"><span>Shipping</span><span>Complimentary</span></div>
-    <div class="row"><span>Engraving &amp; coffret</span><span>Included</span></div>
-    <div class="row total"><span>Subtotal</span><b id="subtotal">$0</b></div>
-    <button class="btn-gold" id="checkoutBtn"><span>Proceed to Checkout</span></button>
-    <div class="secure">Simulated checkout · No payment taken</div>
-  </div>
-</aside>
-
-<div class="toast" id="toast" role="status" aria-live="polite">
-  <div class="toast-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg></div>
-  <div><b id="toastTitle">Merci.</b><span id="toastMsg">Your order is confirmed.</span></div>
-</div>
-
-<noscript><div style="position:fixed;inset:0;z-index:400;background:#070709;color:#F5F2EB;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:22px">Please enable JavaScript to experience AURELIA.</div></noscript>
-
-<script type="module">
-import * as THREE from 'three';
-import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
-
-gsap.registerPlugin(ScrollTrigger);
-const $ = (s, c = document) => c.querySelector(s);
-const $$ = (s, c = document) => [...c.querySelectorAll(s)];
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-window.scrollTo(0, 0);
-
-/* ---------- photography: fade in when loaded, graceful fallback if not ---------- */
-$$('.ph img').forEach(img => {
-  const done = () => img.classList.add('loaded');
-  const fail = () => img.closest('.ph').classList.add('ph-fail');
-  if (img.complete && img.naturalWidth) done();
-  else { img.addEventListener('load', done, { once: true }); img.addEventListener('error', fail, { once: true }); }
-});
-
-/* =========================================================
-   PRELOADER
-   ========================================================= */
-const plNum = $('#plNum'), plBar = $('#plBar');
-const prog = { v: 0 };
-let progTween;
-function setProgress(p, d = 0.8) {
-  return new Promise(res => {
-    progTween && progTween.kill();
-    progTween = gsap.to(prog, {
-      v: p, duration: d, ease: 'power2.out', onComplete: res,
-      onUpdate() { plNum.textContent = Math.round(prog.v); plBar.style.transform = `scaleX(${prog.v / 100})`; }
-    });
-  });
-}
-setProgress(10);
-
-/* =========================================================
-   LENIS  <->  GSAP
-   ========================================================= */
-const lenis = new Lenis({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 0.9 });
-lenis.stop();
-lenis.on('scroll', ScrollTrigger.update);
-gsap.ticker.add(time => lenis.raf(time * 1000));
-gsap.ticker.lagSmoothing(0);
-
-const nav = $('#nav');
-const railBar = $('#railBar');
-lenis.on('scroll', ({ scroll, progress }) => {
-  nav.classList.toggle('scrolled', scroll > 40);
-  railBar.style.transform = `scaleY(${progress || 0})`;
-});
-$$('[data-scroll]').forEach(a => a.addEventListener('click', e => {
-  e.preventDefault();
-  lenis.scrollTo(a.getAttribute('href'), { duration: 2.2, easing: t => 1 - Math.pow(1 - t, 4) });
-}));
-
-/* =========================================================
-   THREE — renderer / camera
-   ========================================================= */
-const canvas = $('#webgl');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
-renderer.setClearColor(0x070709, 1);
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0.05, 8.2);
-
-const isMobile = () => window.innerWidth < 960;
-function visibleSize() {
-  const h = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-  return { w: h * camera.aspect, h };
-}
-let respScale = 1;
-const computeRespScale = () => { respScale = THREE.MathUtils.clamp(visibleSize().w / 4.8, 0.55, 1); };
-computeRespScale();
-
-/* =========================================================
-   STUDIO SOFTBOX ENVIRONMENT (custom PMREM scene)
-   ========================================================= */
-const pmrem = new THREE.PMREMGenerator(renderer);
-function buildStudioEnvironment() {
-  const env = new THREE.Scene();
-  env.background = new THREE.Color(0x030303);
-  const room = new THREE.Mesh(new THREE.BoxGeometry(24, 24, 24), new THREE.MeshBasicMaterial({ color: 0x0a0908, side: THREE.BackSide }));
-  env.add(room);
-  const panel = (w, h, hex, intensity, pos) => {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).multiplyScalar(intensity), side: THREE.DoubleSide }));
-    m.position.set(...pos); m.lookAt(0, 0, 0); env.add(m);
-  };
-  panel(2.4, 7, '#ffffff', 3.2, [-6.5, 1.2, 3.2]);   // large key softbox, front-left
-  panel(0.55, 9, '#ffffff', 16, [6.5, 0.4, 1.6]);    // crisp vertical strip, right
-  panel(0.45, 9, '#fff0cf', 9, [4.6, 0.6, -5.5]);    // warm strip, back-right (gold edge)
-  panel(0.45, 8, '#ffffff', 10, [-4.8, 0.2, -5.4]);  // rim strip, back-left
-  panel(0.35, 6, '#ffffff', 6, [2.4, 0.4, 8.5]);     // thin front glint strip
-  panel(9, 2.2, '#fff6e6', 3.5, [0, 8.5, 0.5]);      // overhead
-  panel(7, 1.4, '#d4af37', 2.4, [0, -6.5, 2.5]);     // gold floor bounce
-  const tex = pmrem.fromScene(env, 0).texture;
-  env.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
-  return tex;
-}
-scene.environment = buildStudioEnvironment();
-
-/* ---------- lights ---------- */
-scene.add(new THREE.AmbientLight(0xfff2dc, 0.05));
-const keyLight = new THREE.DirectionalLight(0xffdcae, 2.6);
-keyLight.position.set(-4, 5, 5);
-scene.add(keyLight);
-const RIM_DEFAULT = new THREE.Color('#7f98ff');
-const rimLight = new THREE.DirectionalLight(RIM_DEFAULT.clone(), 3.6);
-rimLight.position.set(5, 2.5, -4);
-scene.add(rimLight);
-const rimPoint = new THREE.PointLight(RIM_DEFAULT.clone(), 22, 14, 2);
-rimPoint.position.set(-3.6, 1.4, -2.6);
-scene.add(rimPoint);
-const underGlow = new THREE.PointLight(0xd4af37, 10, 9, 2);
-underGlow.position.set(0, -2.6, 1.8);
-scene.add(underGlow);
-
-/* =========================================================
-   GEOMETRY HELPERS
-   ========================================================= */
-function roundedRect(w, h, rTop, rBot) {
-  const s = new THREE.Shape(), x = w / 2, y = h / 2;
-  s.moveTo(-x + rBot, -y); s.lineTo(x - rBot, -y); s.quadraticCurveTo(x, -y, x, -y + rBot);
-  s.lineTo(x, y - rTop); s.quadraticCurveTo(x, y, x - rTop, y);
-  s.lineTo(-x + rTop, y); s.quadraticCurveTo(-x, y, -x, y - rTop);
-  s.lineTo(-x, -y + rBot); s.quadraticCurveTo(-x, -y, -x + rBot, -y);
-  return s;
-}
-function sculpt(shape, depth, bevelT, bevelS, segs = 6, curve = 14) {
-  const g = new THREE.ExtrudeGeometry(shape, {
-    depth, bevelEnabled: true, bevelThickness: bevelT, bevelSize: bevelS, bevelSegments: segs, curveSegments: curve
-  });
-  g.translate(0, 0, -depth / 2);
-  return toCreasedNormals(g, Math.PI / 4.2); // smooth rounded bevels, crisp large-angle edges
-}
-const canvasTex = (c, srgb = true) => {
-  const t = new THREE.CanvasTexture(c);
-  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  return t;
-};
-
-/* =========================================================
-   GROUPS
-   ========================================================= */
-const scrollGroup = new THREE.Group();   // driven by scroll timeline
-const floatGroup = new THREE.Group();    // idle float + mouse + intro
-const sizeGroup = new THREE.Group();     // 50 / 100 ml
-const assembly = new THREE.Group();      // all parts
-assembly.position.y = -0.52;
-scene.add(scrollGroup); scrollGroup.add(floatGroup); floatGroup.add(sizeGroup); sizeGroup.add(assembly);
-
-/* =========================================================
-   MATERIALS
-   ========================================================= */
-const glassMat = new THREE.MeshPhysicalMaterial({
-  color: 0xffffff, metalness: 0, roughness: 0.03,
-  transmission: 0.96, ior: 1.54, thickness: 2.5,
-  attenuationColor: new THREE.Color('#ffe8b3'), attenuationDistance: 1.8,
-  clearcoat: 1, clearcoatRoughness: 0.02, specularIntensity: 1, envMapIntensity: 1.05
-});
-const liquidMat = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color('#c58a22'), emissive: new THREE.Color('#8a5a06'), emissiveIntensity: 0.16,
-  roughness: 0.04, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.03,
-  sheen: 0.4, sheenColor: new THREE.Color('#ffd27a'), envMapIntensity: 0.7, vertexColors: true
-});
-const goldMat = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color('#d3a63a'), metalness: 0.95, roughness: 0.18, envMapIntensity: 1.1,
-  anisotropy: 0.7, clearcoat: 0.25, clearcoatRoughness: 0.2
-});
-const polishedGold = goldMat.clone(); polishedGold.roughness = 0.1; polishedGold.anisotropy = 0;
-const silverMat = new THREE.MeshPhysicalMaterial({ color: 0xdfe2e6, metalness: 1, roughness: 0.12, envMapIntensity: 1.2 });
-const obsidianMat = new THREE.MeshPhysicalMaterial({
-  color: new THREE.Color('#0c0b0e'), metalness: 0.15, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.02,
-  envMapIntensity: 1.25, sheen: 0.2, sheenColor: new THREE.Color('#3a2c1a')
-});
-const holeMat = new THREE.MeshBasicMaterial({ color: 0x030303 });
-const tubeMat = new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, depthWrite: false });
-
-/* =========================================================
-   SCULPTED HEAVY CRYSTAL FLACON
-   ========================================================= */
-const GLASS_W = 1.42, GLASS_H = 1.9, GLASS_D = 0.72, BEV_T = 0.14, BEV_S = 0.1;
-const glass = new THREE.Mesh(sculpt(roundedRect(GLASS_W, GLASS_H, 0.34, 0.16), GLASS_D, BEV_T, BEV_S, 6, 16), glassMat);
-assembly.add(glass);
-const FRONT_Z = GLASS_D / 2 + BEV_T;      // 0.50
-const GLASS_TOP = GLASS_H / 2 + BEV_S;    // 1.05
-const GLASS_BOTTOM = -GLASS_TOP;
-
-const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.23, 0.08, 64), glassMat);
-neck.position.y = GLASS_TOP + 0.02;
-assembly.add(neck);
-
-/* ---------- internal liquid (thick clear crystal base below it) ---------- */
-const LIQ_W = 1.12, LIQ_H = 1.02, LIQ_D = 0.44, LIQ_B = 0.05;
-const LIQ_BOTTOM = -0.62;
-const LIQ_TOP = LIQ_BOTTOM + LIQ_H + LIQ_B * 2;
-const liquidGeo = sculpt(roundedRect(LIQ_W, LIQ_H, 0.06, 0.1), LIQ_D, LIQ_B, LIQ_B, 3, 10);
-liquidGeo.translate(0, LIQ_BOTTOM + LIQ_B + LIQ_H / 2, 0);
-(() => { // depth absorption: denser colour toward the base
-  const p = liquidGeo.attributes.position, cols = new Float32Array(p.count * 3);
-  for (let i = 0; i < p.count; i++) {
-    const k = THREE.MathUtils.clamp((p.getY(i) - LIQ_BOTTOM) / (LIQ_TOP - LIQ_BOTTOM), 0, 1);
-    const v = 0.42 + Math.pow(k, 1.4) * 0.68;
-    cols[i * 3] = v; cols[i * 3 + 1] = v * (0.94 + k * 0.06); cols[i * 3 + 2] = v * (0.86 + k * 0.14);
-  }
-  liquidGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-})();
-const liquid = new THREE.Mesh(liquidGeo, liquidMat);
-assembly.add(liquid);
-
-/* ---------- curved meniscus surface with shimmer ---------- */
-const MEN_W = LIQ_W + LIQ_B * 1.6, MEN_D = LIQ_D + LIQ_B * 1.6;
-const meniscusGeo = new THREE.PlaneGeometry(MEN_W, MEN_D, 48, 20);
-meniscusGeo.rotateX(-Math.PI / 2);
-const menBase = Float32Array.from(meniscusGeo.attributes.position.array);
-meniscusGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(meniscusGeo.attributes.position.count * 3).fill(1.08), 3));
-const meniscus = new THREE.Mesh(meniscusGeo, liquidMat);
-meniscus.position.y = LIQ_TOP - 0.012;
-assembly.add(meniscus);
-function updateMeniscus(t, slosh) {
-  const p = meniscusGeo.attributes.position;
-  for (let i = 0; i < p.count; i++) {
-    const x = menBase[i * 3], z = menBase[i * 3 + 2];
-    const edge = Math.max(Math.abs(x) / (MEN_W / 2), Math.abs(z) / (MEN_D / 2));
-    const curl = Math.pow(edge, 6) * 0.03;                       // capillary rise at the walls
-    const shimmer = Math.sin(x * 9 + t * 1.7) * Math.cos(z * 11 - t * 1.3) * 0.0028 + Math.sin(x * 23 - t * 2.6) * 0.0009;
-    p.setY(i, curl + shimmer * (1 - edge * 0.6) + x * slosh);
-  }
-  p.needsUpdate = true;
-  meniscusGeo.computeVertexNormals();
-}
-
-/* =========================================================
-   EMBOSSED COTTON-PAPER + GOLD-FOIL LABEL (1024²: colour, roughness, metalness, bump)
-   ========================================================= */
-const LBL = 1024;
-const mkCanvas = () => { const c = document.createElement('canvas'); c.width = c.height = LBL; return c; };
-const lblColor = mkCanvas(), lblRough = mkCanvas(), lblMetal = mkCanvas(), lblBump = mkCanvas();
-const noiseCanvas = (() => {   // cotton fibre grain
-  const c = document.createElement('canvas'); c.width = c.height = 256;
-  const x = c.getContext('2d'), d = x.createImageData(256, 256);
-  for (let i = 0; i < d.data.length; i += 4) { const v = 118 + Math.random() * 20; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
-  x.putImageData(d, 0, 0);
-  x.globalAlpha = 0.16; x.strokeStyle = '#000'; x.lineWidth = 0.6;
-  for (let i = 0; i < 220; i++) { x.beginPath(); const sx = Math.random() * 256, sy = Math.random() * 256; x.moveTo(sx, sy); x.quadraticCurveTo(sx + Math.random() * 20 - 10, sy + Math.random() * 20 - 10, sx + Math.random() * 30 - 15, sy + Math.random() * 30 - 15); x.stroke(); }
-  return c;
-})();
-function spaced(ctx, text, cx, y, spacing) {
-  const chars = [...text], widths = chars.map(ch => ctx.measureText(ch).width);
-  const total = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
-  let x = cx - total / 2; ctx.textAlign = 'left';
-  chars.forEach((ch, i) => { ctx.fillText(ch, x, y); x += widths[i] + spacing; });
-}
-function paintLabel(ctx, mode, ml) {
-  const W = LBL, H = LBL;
-  const paper = { color: '#efe7d6', rough: '#d6d6d6', metal: '#000', bump: '#7a7a7a' }[mode];
-  const foil = mode === 'color'
-    ? (() => { const g = ctx.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#8d6a1c'); g.addColorStop(.3, '#f1d98e'); g.addColorStop(.52, '#c9a03a'); g.addColorStop(.75, '#f6e2a2'); g.addColorStop(1, '#8d6a1c'); return g; })()
-    : { rough: '#3a3a3a', metal: '#fff', bump: '#c8c8c8' }[mode];
-  const ink = { color: '#1b1612', rough: '#b0b0b0', metal: '#000', bump: '#a2a2a2' }[mode];
-  const inkSoft = { color: 'rgba(27,22,18,.62)', rough: '#b8b8b8', metal: '#000', bump: '#949494' }[mode];
-
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = paper; ctx.fillRect(0, 0, W, H);
-  if (mode === 'color' || mode === 'bump') {
-    ctx.save(); ctx.globalAlpha = mode === 'color' ? 0.22 : 0.9; ctx.globalCompositeOperation = mode === 'color' ? 'multiply' : 'source-over';
-    ctx.fillStyle = ctx.createPattern(noiseCanvas, 'repeat'); ctx.fillRect(0, 0, W, H); ctx.restore();
-  }
-  if (mode === 'color') {
-    const v = ctx.createRadialGradient(W / 2, H / 2, W * 0.3, W / 2, H / 2, W * 0.75);
-    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(70,50,20,.18)');
-    ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
-  }
-  ctx.filter = mode === 'bump' ? 'blur(1.6px)' : 'none';
-  // double gold-foil border
-  ctx.strokeStyle = foil; ctx.lineWidth = 5; ctx.strokeRect(46, 46, W - 92, H - 92);
-  ctx.lineWidth = 2; ctx.strokeRect(66, 66, W - 132, H - 132);
-  ctx.fillStyle = foil;
-  [[66, 66], [W - 66, 66], [66, H - 66], [W - 66, H - 66]].forEach(([x, y]) => { ctx.save(); ctx.translate(x, y); ctx.rotate(Math.PI / 4); ctx.fillRect(-9, -9, 18, 18); ctx.restore(); });
-  // monogram crest
-  ctx.save(); ctx.translate(W / 2, 214); ctx.rotate(Math.PI / 4); ctx.lineWidth = 3; ctx.strokeStyle = foil; ctx.strokeRect(-34, -34, 68, 68); ctx.restore();
-  ctx.font = 'italic 500 62px "Cormorant Garamond", serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('A', W / 2, 216);
-  ctx.textBaseline = 'alphabetic';
-  // AURELIA — gold foil
-  ctx.font = '500 150px "Cormorant Garamond", serif';
-  spaced(ctx, 'AURELIA', W / 2, 452, 26);
-  ctx.fillRect(W / 2 - 170, 500, 340, 2.5);
-  // L'ÉLIXIR NOCTURNE — embossed ink
-  ctx.fillStyle = ink;
-  ctx.font = 'italic 500 66px "Cormorant Garamond", serif';
-  spaced(ctx, "L'ÉLIXIR NOCTURNE", W / 2, 600, 5);
-  ctx.fillStyle = inkSoft;
-  ctx.font = '500 25px "Plus Jakarta Sans", sans-serif';
-  spaced(ctx, `EXTRAIT DE PARFUM  •  ${ml} ML  •  ${ml === 50 ? '1.7' : '3.4'} FL.OZ`, W / 2, 704, 6);
-  // PARIS — foil
-  ctx.fillStyle = foil;
-  ctx.fillRect(W / 2 - 60, 790, 120, 1.5);
-  ctx.font = '500 34px "Cormorant Garamond", serif';
-  spaced(ctx, 'PARIS', W / 2, 858, 22);
-  ctx.filter = 'none';
-}
-const labelTex = canvasTex(lblColor), labelRoughTex = canvasTex(lblRough, false), labelMetalTex = canvasTex(lblMetal, false), labelBumpTex = canvasTex(lblBump, false);
-function drawLabel(ml = 100) {
-  paintLabel(lblColor.getContext('2d'), 'color', ml);
-  paintLabel(lblRough.getContext('2d'), 'rough', ml);
-  paintLabel(lblMetal.getContext('2d'), 'metal', ml);
-  paintLabel(lblBump.getContext('2d'), 'bump', ml);
-  [labelTex, labelRoughTex, labelMetalTex, labelBumpTex].forEach(t => t.needsUpdate = true);
-}
-const labelMat = new THREE.MeshPhysicalMaterial({
-  map: labelTex, roughnessMap: labelRoughTex, metalnessMap: labelMetalTex, bumpMap: labelBumpTex, bumpScale: 1.6,
-  roughness: 1, metalness: 1, envMapIntensity: 0.9, clearcoat: 0.08, transparent: true, sheen: 0.3, sheenColor: new THREE.Color('#fff4dd')
-});
-const label = new THREE.Mesh(new THREE.PlaneGeometry(0.84, 0.84), labelMat);
-label.position.set(0, -0.08, FRONT_Z + 0.003);
-label.renderOrder = 2;
-assembly.add(label);
-
-/* =========================================================
-   ATOMIZER: knurled 24K collar, actuator, micro-orifice, curved dip tube
-   ========================================================= */
-const collarGroup = new THREE.Group();
-assembly.add(collarGroup);
-const COLLAR_Y = GLASS_TOP + 0.02;
-const knurlGeo = (() => {
-  const g = new THREE.CylinderGeometry(0.27, 0.27, 0.2, 288, 4, false);
-  const p = g.attributes.position;
-  for (let i = 0; i < p.count; i++) {
-    const x = p.getX(i), z = p.getZ(i);
-    if (Math.hypot(x, z) < 0.2) continue;
-    const ridge = Math.pow(0.5 + 0.5 * Math.cos(Math.atan2(z, x) * 96), 0.7);
-    const k = 1 + ridge * 0.03;
-    p.setX(i, x * k); p.setZ(i, z * k);
-  }
-  g.computeVertexNormals();
-  return g;
-})();
-const knurl = new THREE.Mesh(knurlGeo, goldMat);
-knurl.position.y = COLLAR_Y + 0.14;
-const bandLo = new THREE.Mesh(new THREE.CylinderGeometry(0.288, 0.296, 0.04, 96), polishedGold);
-bandLo.position.y = COLLAR_Y + 0.02;
-const bandHi = new THREE.Mesh(new THREE.CylinderGeometry(0.276, 0.288, 0.035, 96), polishedGold);
-bandHi.position.y = COLLAR_Y + 0.258;
-const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.06, 32), silverMat);
-stem.position.y = COLLAR_Y + 0.305;
-
-const actuatorGroup = new THREE.Group();
-actuatorGroup.rotation.y = 1.0;                // orifice faces right-front, slightly toward the viewer
-const ACT_Y = COLLAR_Y + 0.43;
-const actuator = new THREE.Mesh(new THREE.CylinderGeometry(0.148, 0.16, 0.19, 96), polishedGold);
-actuator.position.y = ACT_Y;
-const actDome = new THREE.Mesh(new THREE.SphereGeometry(0.148, 64, 16, 0, Math.PI * 2, 0, Math.PI / 2), polishedGold);
-actDome.scale.y = 0.32; actDome.position.y = ACT_Y + 0.095;
-const orificeRing = new THREE.Mesh(new THREE.TorusGeometry(0.026, 0.008, 16, 40), silverMat);
-orificeRing.position.set(0, ACT_Y + 0.01, 0.156);
-const orificeHole = new THREE.Mesh(new THREE.CircleGeometry(0.02, 24), holeMat);
-orificeHole.position.set(0, ACT_Y + 0.01, 0.1575);
-const nozzleTip = new THREE.Object3D(); nozzleTip.position.set(0, ACT_Y + 0.01, 0.175);
-actuatorGroup.add(actuator, actDome, orificeRing, orificeHole, nozzleTip);
-const actuatorPress = new THREE.Group(); actuatorPress.add(actuatorGroup);
-
-// barely-visible curved glass dip tube reaching the bottom corner
-const tubeCurve = new THREE.CatmullRomCurve3([
-  new THREE.Vector3(0, COLLAR_Y + 0.05, 0), new THREE.Vector3(0.01, 0.62, 0), new THREE.Vector3(0.06, 0.05, 0.02),
-  new THREE.Vector3(0.24, -0.4, 0.05), new THREE.Vector3(0.44, LIQ_BOTTOM + 0.04, 0.08)
-]);
-const dipTube = new THREE.Mesh(new THREE.TubeGeometry(tubeCurve, 80, 0.0075, 10, false), tubeMat);
-dipTube.renderOrder = 1;
-collarGroup.add(knurl, bandLo, bandHi, stem, actuatorPress, dipTube);
-[knurl, bandLo, bandHi, stem, actuator, actDome, orificeRing, orificeHole].forEach(m => m.renderOrder = 2);
-
-/* =========================================================
-   HEAVY MAGNETIC CAP — smoked obsidian + gold
-   ========================================================= */
-const capGroup = new THREE.Group();
-assembly.add(capGroup);
-const CAP_W = 0.8, CAP_H = 0.92, CAP_D = 0.6, CAP_BEV = 0.06;
-const CAP_BASE = GLASS_TOP + 0.03;
-const capBody = new THREE.Mesh(sculpt(roundedRect(CAP_W, CAP_H, 0.14, 0.03), CAP_D, CAP_BEV, CAP_BEV, 5, 12), obsidianMat);
-capBody.position.y = CAP_BASE + CAP_BEV + CAP_H / 2;
-const capBand = new THREE.Mesh(sculpt(roundedRect(CAP_W + 0.05, 0.06, 0.01, 0.01), CAP_D + 0.05, 0.03, 0.02, 3, 6), polishedGold);
-capBand.position.y = CAP_BASE + 0.06;
-const plaqueCanvas = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; return c; })();
-const plaqueTex = canvasTex(plaqueCanvas);
-function drawPlaque() {
-  const x = plaqueCanvas.getContext('2d');
-  x.clearRect(0, 0, 256, 256);
-  const g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, '#9c7623'); g.addColorStop(.45, '#f3dc94'); g.addColorStop(1, '#a37b25');
-  x.strokeStyle = g; x.fillStyle = g; x.lineWidth = 5;
-  x.save(); x.translate(128, 128); x.rotate(Math.PI / 4); x.strokeRect(-70, -70, 140, 140); x.restore();
-  x.font = 'italic 500 120px "Cormorant Garamond", serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-  x.fillText('A', 128, 134);
-  plaqueTex.needsUpdate = true;
-}
-const plaque = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.22), new THREE.MeshPhysicalMaterial({ map: plaqueTex, transparent: true, metalness: 0.9, roughness: 0.2, envMapIntensity: 1.2 }));
-plaque.position.set(0, CAP_BASE + CAP_BEV + CAP_H * 0.56, CAP_D / 2 + CAP_BEV + 0.002);
-capGroup.add(capBody, capBand, plaque);
-[capBody, capBand, plaque].forEach(m => m.renderOrder = 2);
-
-/* ---------- 3D anchors ---------- */
-const anchorCrystal = new THREE.Object3D(); anchorCrystal.position.set(0.78, -0.82, 0.3); assembly.add(anchorCrystal);
-const anchorAtomizer = new THREE.Object3D(); anchorAtomizer.position.set(0.28, COLLAR_Y + 0.14, 0.05); collarGroup.add(anchorAtomizer);
-const anchorLiquid = new THREE.Object3D(); anchorLiquid.position.set(-0.5, 0.2, 0.22); assembly.add(anchorLiquid);
-const anchorBase = new THREE.Object3D(); anchorBase.position.set(0, GLASS_BOTTOM, 0); assembly.add(anchorBase);
-
-/* =========================================================
-   BACKDROP GLOW, CONTACT SHADOW, LIGHT POOL
-   ========================================================= */
-function radialCanvas(size, stops, bg = null) {
-  const c = document.createElement('canvas'); c.width = c.height = size;
-  const x = c.getContext('2d');
-  if (bg) { x.fillStyle = bg; x.fillRect(0, 0, size, size); }
-  const g = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  stops.forEach(([o, col]) => g.addColorStop(o, col));
-  x.fillStyle = g; x.fillRect(0, 0, size, size);
-  return c;
-}
-const glowMat = new THREE.MeshBasicMaterial({
-  map: canvasTex(radialCanvas(512, [[0, 'rgba(255,255,255,.7)'], [.2, 'rgba(255,255,255,.3)'], [.5, 'rgba(255,255,255,.07)'], [1, 'rgba(0,0,0,1)']], '#000')),
-  color: new THREE.Color('#D4AF37').multiplyScalar(0.4), blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
-});
-const glow = new THREE.Mesh(new THREE.PlaneGeometry(11, 11), glowMat);
-glow.position.z = -3;
-scene.add(glow);
-
-const shadowMat = new THREE.MeshBasicMaterial({
-  map: canvasTex(radialCanvas(256, [[0, 'rgba(0,0,0,.95)'], [.35, 'rgba(0,0,0,.6)'], [.7, 'rgba(0,0,0,.18)'], [1, 'rgba(0,0,0,0)']])),
-  transparent: true, depthWrite: false, toneMapped: false
-});
-const contactShadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
-contactShadow.rotation.x = -Math.PI / 2;
-scene.add(contactShadow);
-const poolMat = new THREE.MeshBasicMaterial({
-  map: canvasTex(radialCanvas(256, [[0, 'rgba(255,255,255,.5)'], [.4, 'rgba(255,255,255,.14)'], [1, 'rgba(255,255,255,0)']])),
-  color: new THREE.Color('#d4af37'), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false
-});
-const lightPool = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), poolMat);
-lightPool.rotation.x = -Math.PI / 2;
-scene.add(lightPool);
-
-/* =========================================================
-   AMBIENT GOLDEN DUST (150)
-   ========================================================= */
-const dotTex = canvasTex(radialCanvas(64, [[0, 'rgba(255,240,205,1)'], [.3, 'rgba(255,214,130,.55)'], [1, 'rgba(255,200,90,0)']]));
-const P_COUNT = 150;
-const pBase = new Float32Array(P_COUNT * 3), pPos = new Float32Array(P_COUNT * 3), pSeed = new Float32Array(P_COUNT * 3);
-for (let i = 0; i < P_COUNT; i++) {
-  const r = 1.5 + Math.random() * 2.6, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
-  pBase[i * 3] = r * Math.sin(ph) * Math.cos(th);
-  pBase[i * 3 + 1] = r * Math.cos(ph) * 0.85;
-  pBase[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th) * 0.7;
-  pSeed[i * 3] = Math.random() * Math.PI * 2; pSeed[i * 3 + 1] = 0.2 + Math.random() * 0.5; pSeed[i * 3 + 2] = Math.random();
-}
-const pGeo = new THREE.BufferGeometry();
-pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-const pMat = new THREE.PointsMaterial({ size: 0.045, map: dotTex, color: 0xd4af37, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending });
-const dust = new THREE.Points(pGeo, pMat);
-dust.frustumCulled = false;
-scene.add(dust);
-
-/* =========================================================
-   VOLUMETRIC PERFUME SPRAY (soft sprite particles with air drag)
-   ========================================================= */
-const MIST_MAX = 1100;
-const mistTexCanvas = (() => {
-  const c = document.createElement('canvas'); c.width = c.height = 128;
-  const x = c.getContext('2d');
-  for (let i = 0; i < 7; i++) { // irregular soft puff
-    const px = 64 + (Math.random() - .5) * 34, py = 64 + (Math.random() - .5) * 34, r = 26 + Math.random() * 30;
-    const g = x.createRadialGradient(px, py, 0, px, py, r);
-    g.addColorStop(0, 'rgba(255,255,255,.32)'); g.addColorStop(.5, 'rgba(255,255,255,.12)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-    x.fillStyle = g; x.fillRect(0, 0, 128, 128);
-  }
-  return c;
-})();
-const mistGeo = new THREE.BufferGeometry();
-const mPos = new Float32Array(MIST_MAX * 3), mSize = new Float32Array(MIST_MAX), mAlpha = new Float32Array(MIST_MAX), mTint = new Float32Array(MIST_MAX);
-mistGeo.setAttribute('position', new THREE.BufferAttribute(mPos, 3));
-mistGeo.setAttribute('aSize', new THREE.BufferAttribute(mSize, 1));
-mistGeo.setAttribute('aAlpha', new THREE.BufferAttribute(mAlpha, 1));
-mistGeo.setAttribute('aTint', new THREE.BufferAttribute(mTint, 1));
-const mistMat = new THREE.ShaderMaterial({
-  uniforms: {
-    uTex: { value: canvasTex(mistTexCanvas) },
-    uScale: { value: 1 },
-    uWarm: { value: new THREE.Color('#ffd98c') },
-    uCool: { value: new THREE.Color('#fff8ec') }
-  },
-  vertexShader: `
-    attribute float aSize; attribute float aAlpha; attribute float aTint;
-    uniform float uScale; varying float vA; varying float vT;
-    void main(){
-      vec4 mv = modelViewMatrix * vec4(position, 1.0);
-      gl_Position = projectionMatrix * mv;
-      gl_PointSize = aSize * uScale / max(0.1, -mv.z);
-      vA = aAlpha; vT = aTint;
-    }`,
-  fragmentShader: `
-    uniform sampler2D uTex; uniform vec3 uWarm; uniform vec3 uCool;
-    varying float vA; varying float vT;
-    void main(){
-      vec4 t = texture2D(uTex, gl_PointCoord);
-      gl_FragColor = vec4(mix(uCool, uWarm, vT), t.a * vA);
-    }`,
-  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
-});
-const mist = new THREE.Points(mistGeo, mistMat);
-mist.frustumCulled = false;
-scene.add(mist);
-const mVel = new Float32Array(MIST_MAX * 3), mAge = new Float32Array(MIST_MAX).fill(1e9), mLife = new Float32Array(MIST_MAX).fill(1),
-  mS0 = new Float32Array(MIST_MAX), mS1 = new Float32Array(MIST_MAX), mA0 = new Float32Array(MIST_MAX), mSeed = new Float32Array(MIST_MAX), mDrag = new Float32Array(MIST_MAX);
-let mistCursor = 0;
-const emitter = { remaining: 0, rate: 0 };
-const _tip = new THREE.Vector3(), _dir = new THREE.Vector3(), _q = new THREE.Quaternion();
-function updateMistScale() { mistMat.uniforms.uScale.value = renderer.getPixelRatio() * window.innerHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))); }
-updateMistScale();
-function emitMist(n) {
-  nozzleTip.getWorldPosition(_tip);
-  nozzleTip.getWorldQuaternion(_q);
-  const ws = respScale * sizeGroup.scale.x * scrollGroup.scale.x;
-  for (let k = 0; k < n; k++) {
-    const i = mistCursor; mistCursor = (mistCursor + 1) % MIST_MAX;
-    const droplet = Math.random() < 0.28;
-    // fine conical plume around the nozzle axis
-    const cone = (droplet ? 0.1 : 0.2) * Math.sqrt(Math.random()), phi = Math.random() * Math.PI * 2;
-    _dir.set(Math.sin(cone) * Math.cos(phi), Math.sin(cone) * Math.sin(phi) + 0.03, Math.cos(cone)).applyQuaternion(_q).normalize();
-    const speed = (droplet ? 5.5 : 3.4) * (0.75 + Math.random() * 0.5) * ws;
-    mPos[i * 3] = _tip.x + _dir.x * 0.02; mPos[i * 3 + 1] = _tip.y + _dir.y * 0.02; mPos[i * 3 + 2] = _tip.z + _dir.z * 0.02;
-    mVel[i * 3] = _dir.x * speed; mVel[i * 3 + 1] = _dir.y * speed; mVel[i * 3 + 2] = _dir.z * speed;
-    mAge[i] = 0;
-    mLife[i] = droplet ? 0.9 + Math.random() * 0.7 : 2.4 + Math.random() * 1.8;
-    mS0[i] = (droplet ? 0.015 : 0.04) * ws;
-    mS1[i] = (droplet ? 0.05 + Math.random() * 0.04 : 0.55 + Math.random() * 0.75) * ws;
-    mA0[i] = droplet ? 0.55 + Math.random() * 0.3 : 0.1 + Math.random() * 0.12;
-    mDrag[i] = droplet ? 2.0 : 2.9 + Math.random() * 0.8;
-    mSeed[i] = Math.random() * 100;
-    mTint[i] = Math.random() * 0.75;
-  }
-}
-let mistAlive = false;
-function updateMist(dt, t) {
-  if (emitter.remaining > 0) {
-    const n = Math.min(emitter.remaining, Math.ceil(emitter.rate * dt));
-    emitMist(n); emitter.remaining -= n;
-  }
-  let any = false;
-  for (let i = 0; i < MIST_MAX; i++) {
-    if (mAge[i] > mLife[i]) { if (mAlpha[i] !== 0) { mAlpha[i] = 0; mSize[i] = 0; } continue; }
-    any = true;
-    const a = mAge[i] = mAge[i] + dt, k = Math.min(a / mLife[i], 1), j = i * 3, s = mSeed[i];
-    const drag = Math.exp(-mDrag[i] * dt);                     // air resistance
-    mVel[j] *= drag; mVel[j + 1] *= drag; mVel[j + 2] *= drag;
-    const slow = Math.min(1, k * 3);                           // buoyant vapour + turbulence once slowed
-    mVel[j + 1] += (0.16 + Math.sin(s) * 0.05) * dt * slow;
-    mVel[j] += Math.sin(t * 1.3 + s + mPos[j + 1] * 2.2) * 0.22 * dt * slow;
-    mVel[j + 2] += Math.cos(t * 1.1 + s * 1.7 + mPos[j] * 1.8) * 0.18 * dt * slow;
-    mPos[j] += mVel[j] * dt; mPos[j + 1] += mVel[j + 1] * dt; mPos[j + 2] += mVel[j + 2] * dt;
-    mSize[i] = mS0[i] + (mS1[i] - mS0[i]) * (1 - Math.pow(1 - k, 2.4));
-    mAlpha[i] = mA0[i] * Math.min(1, k / 0.05) * Math.pow(1 - k, 1.5);
-  }
-  if (any || mistAlive) {
-    mistGeo.attributes.position.needsUpdate = true;
-    mistGeo.attributes.aSize.needsUpdate = true;
-    mistGeo.attributes.aAlpha.needsUpdate = true;
-    mistGeo.attributes.aTint.needsUpdate = true;
-  }
-  mistAlive = any;
-}
-
-/* =========================================================
-   STATE
-   ========================================================= */
-const S = { x: 0, y: 0, rx: 0, ry: 0, rz: 0, s: 1, cap: 0, collar: 0, mist: 0, call: 0 };
-const manual = { cap: 0, press: 0 };
-const intro = { s: 0.55, r: -1.6, y: -0.9 };
-const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-window.addEventListener('pointermove', e => {
-  if (e.pointerType !== 'mouse') return;
-  mouse.tx = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.ty = (e.clientY / window.innerHeight) * 2 - 1;
-});
-
-/* ---------- spray choreography ---------- */
-let sprayBusy = false;
-function pressAndSpray() {
-  gsap.timeline()
-    .to(manual, { press: 1, duration: 0.11, ease: 'power2.in' })
-    .add(() => { emitter.remaining = 620; emitter.rate = 2600; })
-    .to(manual, { press: 0, duration: 0.45, ease: 'power3.out' }, '+=0.16');
-}
-function sprayMist(btn) {
-  if (sprayBusy) return;
-  sprayBusy = true;
-  if (btn) { btn.classList.remove('firing'); void btn.offsetWidth; btn.classList.add('firing'); }
-  const closed = Math.max(S.cap, manual.cap) < 0.6;
-  const tl = gsap.timeline({ onComplete: () => { sprayBusy = false; } });
-  if (closed) tl.to(manual, { cap: 1, duration: 1.0, ease: 'power3.inOut' });
-  tl.add(pressAndSpray);
-  if (closed) tl.to(manual, { cap: 0, duration: 1.2, ease: 'power3.inOut' }, '+=2.0');
-  else tl.to({}, { duration: 1.2 });
-}
-$$('[data-spray]').forEach(b => b.addEventListener('click', () => sprayMist(b)));
-let autoSprayed = false;
-
-/* =========================================================
-   CALLOUTS (projected from 3D anchors)
-   ========================================================= */
-const callouts = [
-  { obj: anchorCrystal, side: 1, dy: 30 },
-  { obj: anchorAtomizer, side: 1, dy: -60 },
-  { obj: anchorLiquid, side: -1, dy: 50 }
-].map((c, i) => ({ ...c, line: $('#cl-line-' + i), dot: $('#cl-dot-' + i), ring: $('#cl-ring-' + i), box: $('#cl-box-' + i) }));
-const calloutLayer = $('#callouts');
-const _v = new THREE.Vector3();
-function updateCallouts() {
-  calloutLayer.style.opacity = S.call.toFixed(3);
-  calloutLayer.style.visibility = S.call > 0.01 ? 'visible' : 'hidden';
-  if (S.call <= 0.01) return;
-  const W = window.innerWidth, H = window.innerHeight, mob = isMobile();
-  const dx = mob ? Math.min(60, W * 0.1) : Math.min(210, W * 0.14);
-  callouts.forEach((c, i) => {
-    c.obj.getWorldPosition(_v).project(camera);
-    const sx = (_v.x * 0.5 + 0.5) * W, sy = (-_v.y * 0.5 + 0.5) * H;
-    const bw = c.box.offsetWidth, bh = c.box.offsetHeight;
-    let lx = sx + c.side * dx, ly = sy + c.dy * (mob ? 0.6 : 1);
-    if (c.side > 0) lx = Math.min(lx, W - bw - 14); else lx = Math.max(lx, bw + 14);
-    ly = THREE.MathUtils.clamp(ly, bh / 2 + 84, H - bh / 2 - 20);
-    const ex = sx + c.side * Math.min(36, Math.abs(lx - sx) * 0.4);
-    c.line.setAttribute('points', `${sx},${sy} ${ex},${ly} ${lx},${ly}`);
-    c.dot.setAttribute('cx', sx); c.dot.setAttribute('cy', sy);
-    c.ring.setAttribute('cx', sx); c.ring.setAttribute('cy', sy);
-    const reveal = THREE.MathUtils.clamp(S.call * 3 - i * 0.9, 0, 1);
-    c.box.style.opacity = reveal;
-    c.box.style.transform = `translate(${lx + (c.side < 0 ? -bw : 0)}px, ${ly - bh / 2 + (1 - reveal) * 14}px)`;
-  });
-}
-
-/* =========================================================
-   RENDER LOOP
-   ========================================================= */
-const clock = new THREE.Clock();
-const _base = new THREE.Vector3();
-const WHITE = new THREE.Color(1, 1, 1);
-let elapsed = 0;
-function tick() {
-  const dt = Math.min(clock.getDelta(), 0.05);
-  elapsed += dt;
-  const t = elapsed;
-  mouse.x += (mouse.tx - mouse.x) * 0.05;
-  mouse.y += (mouse.ty - mouse.y) * 0.05;
-
-  scrollGroup.position.set(S.x, S.y, 0);
-  scrollGroup.rotation.set(S.rx, S.ry, S.rz);
-  scrollGroup.scale.setScalar(S.s);
-
-  const floatY = reduceMotion ? 0 : Math.sin(t * 0.9) * 0.05;
-  floatGroup.position.y = floatY + intro.y;
-  floatGroup.rotation.x = mouse.y * 0.12;
-  floatGroup.rotation.y = mouse.x * 0.3 + (reduceMotion ? 0 : Math.sin(t * 0.3) * 0.12) + intro.r;
-  floatGroup.rotation.z = (reduceMotion ? 0 : Math.sin(t * 0.6) * 0.012) - mouse.x * 0.03;
-  floatGroup.scale.setScalar(respScale * intro.s);
-
-  // cap: scroll-driven OR manual (spray button) — heavy magnetic lift with slight drift
-  const capK = Math.max(S.cap, manual.cap);
-  capGroup.position.y = capK * 1.22 + Math.sin(t * 1.3) * 0.025 * capK;
-  capGroup.rotation.y = capK * 0.55;
-  capGroup.rotation.z = capK * 0.06;
-  collarGroup.position.y = S.collar * 0.22;
-  actuatorPress.position.y = -manual.press * 0.04;
-
-  // synchronized burst right as the cap clears the nozzle on scroll
-  if (S.cap > 0.62 && !autoSprayed) { autoSprayed = true; if (!sprayBusy) pressAndSpray(); }
-  if (S.cap < 0.2) autoSprayed = false;
-
-  // liquid: meniscus shimmer + slosh from motion; dip tube tinted by the liquid
-  updateMeniscus(t, -(floatGroup.rotation.z + scrollGroup.rotation.z) * 0.08);
-  tubeMat.color.copy(liquidMat.color).multiplyScalar(1.22).lerp(WHITE, 0.06);
-
-  glow.position.x = scrollGroup.position.x * 0.9;
-  glow.position.y = scrollGroup.position.y - 0.1;
-  glow.scale.setScalar(respScale * (1 + S.mist * 0.2));
-
-  // contact shadow + warm light pool under the base
-  anchorBase.getWorldPosition(_base);
-  const ws = respScale * S.s * sizeGroup.scale.x * intro.s;
-  const lift = floatY + intro.y;
-  const tilt = Math.abs(scrollGroup.rotation.z) + Math.abs(scrollGroup.rotation.x);
-  const floorY = scrollGroup.position.y + (assembly.position.y + GLASS_BOTTOM) * ws - 0.06 * ws;
-  contactShadow.position.set(_base.x, floorY - Math.max(0, lift) * 0.4, _base.z);
-  contactShadow.scale.set(2.1 * ws * (1 + Math.abs(lift) * 0.6 + tilt * 0.4), 1.25 * ws * (1 + Math.abs(lift) * 0.6), 1);
-  shadowMat.opacity = THREE.MathUtils.clamp(0.85 - Math.abs(lift) * 2.5 - tilt * 0.6, 0.25, 0.9) * Math.min(1, intro.s * 1.4);
-  lightPool.position.set(_base.x, contactShadow.position.y - 0.005, _base.z + 0.15);
-  lightPool.scale.set(3.4 * ws, 2 * ws, 1);
-
-  dust.position.copy(scrollGroup.position);
-  const spread = 1 + S.mist * 0.9;
-  for (let i = 0; i < P_COUNT; i++) {
-    const k = i * 3, ph = pSeed[k], sp = pSeed[k + 1];
-    pPos[k] = pBase[k] * spread * respScale + Math.sin(t * sp + ph) * 0.12;
-    pPos[k + 1] = pBase[k + 1] * spread * respScale + Math.sin(t * sp * 0.8 + ph * 1.7) * 0.16;
-    pPos[k + 2] = pBase[k + 2] * spread * respScale + Math.cos(t * sp * 0.9 + ph) * 0.1;
-  }
-  pGeo.attributes.position.needsUpdate = true;
-  dust.rotation.y = t * 0.03;
-  pMat.opacity = 0.5 + S.mist * 0.35;
-
-  updateMist(dt, t);
-  renderer.render(scene, camera);
-  updateCallouts();
-}
-
-/* =========================================================
-   SCROLL CHOREOGRAPHY — one master timeline measured in scroll pixels
-   ========================================================= */
-const K = {
-  hero: () => ({ x: 0, y: 0, rx: 0, ry: 0, rz: 0, s: 1 }),
-  notes: () => ({ x: isMobile() ? 0 : visibleSize().w * 0.23, y: isMobile() ? 1.15 : 0, rx: 0.08, ry: -0.62, rz: -0.12, s: isMobile() ? 0.68 : 0.95 }),
-  atelier: () => ({ x: isMobile() ? 0 : visibleSize().w * 0.3, y: isMobile() ? 1.35 : 0.05, rx: -0.04, ry: -0.2, rz: 0.05, s: isMobile() ? 0.55 : 0.86 }),
-  craft: () => ({ x: isMobile() ? 0 : visibleSize().w * 0.04, y: isMobile() ? -0.25 : -0.5, rx: -0.03, ry: 0.5, rz: 0, s: isMobile() ? 0.74 : 0.84 }),
-  shop: () => ({ x: isMobile() ? 0 : -visibleSize().w * 0.21, y: isMobile() ? 1.15 : -0.05, rx: 0, ry: -0.3, rz: 0.035, s: isMobile() ? 0.64 : 1 })
-};
-let master = null;
-function scrollAt(sel, edge, vpFrac) {
-  const el = $(sel), r = el.getBoundingClientRect(), top = r.top + window.scrollY;
-  return Math.max(0, (edge === 'top' ? top : top + r.height) - window.innerHeight * vpFrac);
-}
-function buildMaster() {
-  if (master) { master.scrollTrigger && master.scrollTrigger.kill(); master.kill(); }
-  const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-  const kH = K.hero(), kN = K.notes(), kA = K.atelier(), kC = K.craft(), kS = K.shop();
-  master = gsap.timeline({
-    defaults: { ease: 'none', immediateRender: false },
-    scrollTrigger: { start: 0, end: () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight), scrub: 1.1 }
-  });
-  master.to({}, { duration: max }, 0);
-  master.set(S, { ...kH, cap: 0, collar: 0, mist: 0, call: 0 }, 0);
-  const seg = (a, b, from, to, ease = 'none') => { if (b > a) master.fromTo(S, from, { ...to, duration: b - a, ease }, a); };
-
-  seg(scrollAt('#notes', 'top', 1), scrollAt('#notes', 'top', 0.15), kH, kN, 'power1.inOut');
-  seg(scrollAt('#atelier', 'top', 1), scrollAt('#atelier', 'top', 0.2), kN, kA, 'power1.inOut');
-  seg(scrollAt('#craftsmanship', 'top', 1), scrollAt('#craftsmanship', 'top', 0.15), kA, kC, 'power1.inOut');
-
-  // exploded view: heavy cap lifts first, collar + mist follow
-  const exA = scrollAt('#craftsmanship', 'top', 0.4), exB = scrollAt('#craftsmanship', 'bottom', 1);
-  seg(exA, exA + (exB - exA) * 0.45, { cap: 0 }, { cap: 1 }, 'power3.inOut');
-  seg(exA + (exB - exA) * 0.2, exB, { collar: 0, mist: 0 }, { collar: 1, mist: 1 }, 'power2.inOut');
-  seg(scrollAt('#craftsmanship', 'top', 0.3), scrollAt('#craftsmanship', 'top', -0.05), { call: 0 }, { call: 1 });
-
-  const shA = Math.max(exB, scrollAt('#edition', 'top', 1)), shB = scrollAt('#edition', 'top', 0.15);
-  seg(shA, shB, { ...kC, cap: 1, collar: 1, mist: 1 }, { ...kS, cap: 0, collar: 0, mist: 0 }, 'power2.inOut');
-  seg(scrollAt('#edition', 'top', 0.88), scrollAt('#edition', 'top', 0.6), { call: 1 }, { call: 0 });
-}
-let rebuildTimer;
-
-function buildScroll() {
-  buildMaster();
-  gsap.to('.hero-inner', { yPercent: -12, opacity: 0, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom 25%', scrub: true } });
-  gsap.to('#atmos', { yPercent: -6, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
-  gsap.fromTo('#atelierImg', { yPercent: -7 }, { yPercent: 7, ease: 'none', scrollTrigger: { trigger: '#atelier', start: 'top bottom', end: 'bottom top', scrub: true } });
-
-  $$('.reveal').forEach(el => gsap.from(el, {
-    y: 44, opacity: 0, duration: 1.5, ease: 'expo.out',
-    scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' }
-  }));
-  gsap.from('.note-card', {
-    x: -80, opacity: 0, duration: 1.5, ease: 'expo.out', stagger: 0.16,
-    scrollTrigger: { trigger: '.notes-cards', start: 'top 82%', toggleActions: 'play none none reverse' }
-  });
-  $$('main > section').forEach(sec => ScrollTrigger.create({
-    trigger: sec, start: 'top 55%', end: 'bottom 55%',
-    onToggle: self => { if (self.isActive) $('#railCount').textContent = sec.dataset.index; }
-  }));
-}
-
-/* =========================================================
-   NOTES hover → rim light colour
-   ========================================================= */
-function tweenColor(target, color, dur = 1.2) {
-  const c = color instanceof THREE.Color ? color : new THREE.Color(color);
-  return gsap.to(target, { r: c.r, g: c.g, b: c.b, duration: dur, ease: 'power2.inOut', overwrite: 'auto' });
-}
-$$('.note-card').forEach(card => {
-  card.addEventListener('mouseenter', () => {
-    tweenColor(rimLight.color, card.dataset.rim, 0.8); tweenColor(rimPoint.color, card.dataset.rim, 0.8);
-    gsap.to(rimLight, { intensity: 6.5, duration: 0.8 }); gsap.to(rimPoint, { intensity: 38, duration: 0.8 });
-  });
-  card.addEventListener('mouseleave', () => {
-    tweenColor(rimLight.color, RIM_DEFAULT, 1.1); tweenColor(rimPoint.color, RIM_DEFAULT, 1.1);
-    gsap.to(rimLight, { intensity: 3.6, duration: 1.1 }); gsap.to(rimPoint, { intensity: 22, duration: 1.1 });
-  });
-});
-
-/* =========================================================
-   CONFIGURATOR
-   ========================================================= */
-const EDITIONS = {
-  amber: { name: 'Nocturne Amber', liquid: '#c58a22', emissive: '#8a5a06', glow: '#D4AF37', glowI: 0.4, mist: '#ffd98c', swatch: '#D4AF37',
-    desc: 'The signature: liquid gold of amber resin, warm vanilla and a whisper of smoked iris.' },
-  rose: { name: 'Velvet Rose', liquid: '#9a1d42', emissive: '#5c0a22', glow: '#c2456b', glowI: 0.42, mist: '#ffc0d0', swatch: '#c2456b',
-    desc: 'Damask rose absolute, deepened with pink pepper and a velvet base of ambergris.' },
-  oud: { name: 'Obsidian Oud', liquid: '#3d1e0f', emissive: '#1f0d04', glow: '#9a6430', glowI: 0.46, mist: '#e8c39a', swatch: '#8c5a2e',
-    desc: 'Aged oud and black amber, smouldering like embers in an unlit room.' }
-};
-const PRICES = { 50: 210, 100: 320 };
-const state = { edition: 'amber', size: 100 };
-const priceEl = $('#price'), priceObj = { v: 320 };
-
-function setEdition(key) {
-  const e = EDITIONS[key]; if (!e) return;
-  state.edition = key;
-  tweenColor(liquidMat.color, e.liquid, 1.5);
-  tweenColor(liquidMat.emissive, e.emissive, 1.5);
-  tweenColor(glowMat.color, new THREE.Color(e.glow).multiplyScalar(e.glowI), 1.5);
-  tweenColor(underGlow.color, e.glow, 1.5);
-  tweenColor(poolMat.color, e.glow, 1.5);
-  tweenColor(mistMat.uniforms.uWarm.value, e.mist, 1.5);
-  tweenColor(pMat.color, key === 'rose' ? '#f0a0b4' : key === 'oud' ? '#c98d4a' : '#d4af37', 1.5);
-  gsap.fromTo(liquidMat, { emissiveIntensity: 0.7 }, { emissiveIntensity: 0.16, duration: 1.8, ease: 'power2.out' });
-  $$('.ed-opt').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.edition === key)));
-  const swap = [$('#edName'), $('#edDesc'), $('#edLabel')];
-  gsap.to(swap, { opacity: 0, y: -6, duration: 0.25, ease: 'power2.in', onComplete() {
-    $('#edName').textContent = e.name; $('#edLabel').textContent = e.name; $('#edDesc').textContent = e.desc;
-    gsap.to(swap, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' });
-  } });
-}
-function setSize(ml) {
-  ml = Number(ml); state.size = ml;
-  const s = ml === 50 ? 0.82 : 1;
-  gsap.to(sizeGroup.scale, { x: s, y: s, z: s, duration: 1.4, ease: 'expo.inOut' });
-  gsap.to(priceObj, { v: PRICES[ml], duration: 0.9, ease: 'power3.out', onUpdate() { priceEl.textContent = '$' + Math.round(priceObj.v); } });
-  $('#sizeToggle').dataset.size = String(ml);
-  $$('.size-opt').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.size) === ml)));
-  $('#sizeLabel').textContent = ml + ' ML';
-  drawLabel(ml);
-}
-$$('.ed-opt').forEach(b => b.addEventListener('click', () => setEdition(b.dataset.edition)));
-$$('.size-opt').forEach(b => b.addEventListener('click', () => setSize(b.dataset.size)));
-
-/* =========================================================
-   CART
-   ========================================================= */
-const cart = [];
-const fmt = n => '$' + n.toLocaleString('en-US');
-const drawer = $('#cart'), scrim = $('#scrim'), badge = $('#badge');
-function addToBag() {
-  const key = state.edition + '-' + state.size;
-  const found = cart.find(i => i.key === key);
-  if (found) found.qty++; else cart.push({ key, edition: state.edition, size: state.size, price: PRICES[state.size], qty: 1 });
-  renderCart(true);
-  const span = $('#addBtn span'); span.textContent = 'Added to Bag';
-  setTimeout(() => { span.textContent = 'Add to Bag'; }, 1600);
-  setTimeout(openCart, 380);
-}
-function renderCart(pop = false) {
-  const count = cart.reduce((a, i) => a + i.qty, 0), subtotal = cart.reduce((a, i) => a + i.qty * i.price, 0);
-  badge.textContent = count;
-  $('#drawerCount').textContent = `${count} ITEM${count === 1 ? '' : 'S'}`;
-  $('#subtotal').textContent = fmt(subtotal);
-  $('#checkoutBtn').disabled = count === 0;
-  if (pop) gsap.fromTo(badge, { scale: 1.6 }, { scale: 1, duration: 0.7, ease: 'elastic.out(1,0.4)' });
-  const list = $('#cartItems');
-  if (!cart.length) { list.innerHTML = `<div class="empty"><span class="logo-mark"></span><h3>Your bag is empty</h3><p>Compose your edition of L'Élixir Nocturne to begin.</p></div>`; return; }
-  list.innerHTML = cart.map(i => {
-    const e = EDITIONS[i.edition];
-    return `<div class="item" data-key="${i.key}">
-      <div class="item-thumb"><i style="color:${e.swatch};background:${e.swatch}"></i></div>
-      <div><h4>${e.name}</h4><div class="meta">Extrait de Parfum · ${i.size} ML</div>
-        <div class="qty"><button data-act="dec" aria-label="Decrease quantity">&minus;</button><span>${i.qty}</span><button data-act="inc" aria-label="Increase quantity">+</button></div></div>
-      <div class="item-right"><div class="item-price">${fmt(i.price * i.qty)}</div><button class="remove" data-act="rm">Remove</button></div>
-    </div>`;
-  }).join('');
-}
-$('#cartItems').addEventListener('click', e => {
-  const btn = e.target.closest('button[data-act]'); if (!btn) return;
-  const key = btn.closest('.item').dataset.key, idx = cart.findIndex(i => i.key === key); if (idx < 0) return;
-  const act = btn.dataset.act;
-  if (act === 'inc') cart[idx].qty++;
-  if (act === 'dec') cart[idx].qty--;
-  if (act === 'rm' || cart[idx].qty <= 0) {
-    gsap.to(btn.closest('.item'), { opacity: 0, x: 40, duration: 0.35, ease: 'power2.in', onComplete() { cart.splice(cart.findIndex(i => i.key === key), 1); renderCart(true); } });
-    return;
-  }
-  renderCart(true);
-});
-let lastFocus = null;
-function openCart() {
-  lastFocus = document.activeElement;
-  drawer.classList.add('open'); scrim.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
-  lenis.stop();
-  gsap.fromTo('#cartItems .item, #cartItems .empty', { opacity: 0, x: 30 }, { opacity: 1, x: 0, stagger: 0.07, duration: 0.8, delay: 0.25, ease: 'expo.out' });
-  setTimeout(() => $('#closeCart').focus(), 300);
-}
-function closeCart() {
-  drawer.classList.remove('open'); scrim.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
-  lenis.start();
-  lastFocus && lastFocus.focus && lastFocus.focus({ preventScroll: true });
-}
-$('#cartBtn').addEventListener('click', openCart);
-$('#closeCart').addEventListener('click', closeCart);
-scrim.addEventListener('click', closeCart);
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('open')) closeCart(); });
-$('#addBtn').addEventListener('click', addToBag);
-const toast = $('#toast');
-function showToast(title, msg) {
-  $('#toastTitle').textContent = title; $('#toastMsg').textContent = msg;
-  gsap.killTweensOf(toast);
-  gsap.timeline().fromTo(toast, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' }).to(toast, { opacity: 0, y: 20, duration: 0.6, ease: 'power2.in' }, '+=3.8');
-}
-$('#checkoutBtn').addEventListener('click', () => {
-  if (!cart.length) return;
-  const btn = $('#checkoutBtn'), label = $('#checkoutBtn span');
-  btn.disabled = true; label.textContent = 'Processing…';
-  setTimeout(() => {
-    const total = cart.reduce((a, i) => a + i.qty * i.price, 0), order = 'AUR-' + Math.floor(100000 + Math.random() * 900000);
-    cart.length = 0; renderCart(); label.textContent = 'Proceed to Checkout'; closeCart();
-    showToast('Merci. Order confirmed.', `${order} · ${fmt(total)} — a simulated checkout, nothing was charged.`);
-  }, 1500);
-});
-renderCart();
-
-/* =========================================================
-   RESIZE
-   ========================================================= */
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  computeRespScale(); updateMistScale();
-  clearTimeout(rebuildTimer);
-  rebuildTimer = setTimeout(() => { buildMaster(); ScrollTrigger.refresh(); }, 250);
-});
-
-/* =========================================================
-   HERO ENTRANCE + BOOT
-   ========================================================= */
-function heroIntro() {
-  return gsap.timeline({ defaults: { ease: 'expo.out' } })
-    .to(intro, { s: 1, r: 0, y: 0, duration: 3 }, 0)
-    .from('.nav > *', { y: -24, opacity: 0, duration: 1.3, stagger: 0.1 }, 0.35)
-    .from('.rail', { opacity: 0, duration: 1.6 }, 0.6)
-    .from('.hero .kicker', { y: 16, opacity: 0, duration: 1.3 }, 0.5)
-    .from('.hl .word', { yPercent: 118, rotate: 3, duration: 1.7, stagger: 0.08 }, 0.55)
-    .from('.hero-foot > *', { y: 26, opacity: 0, duration: 1.3, stagger: 0.12 }, 1.05)
-    .add(() => { lenis.start(); ScrollTrigger.refresh(); }, 1.1);
-}
-async function boot() {
-  try {
-    const fonts = Promise.all([
-      document.fonts.load('500 150px "Cormorant Garamond"'),
-      document.fonts.load('italic 500 66px "Cormorant Garamond"'),
-      document.fonts.load('500 25px "Plus Jakarta Sans"')
-    ]);
-    await Promise.race([fonts, new Promise(r => setTimeout(r, 3500))]);
-    setProgress(40);
-    drawLabel(100); drawPlaque();
-    setProgress(62);
-    await new Promise(r => requestAnimationFrame(r));
-    renderer.compile(scene, camera);
-    setProgress(84);
-    tick();
-    renderer.setAnimationLoop(tick);
-    buildScroll();
-  } catch (err) { console.error('AURELIA 3D init failed:', err); }
-  await setProgress(100, 0.7);
-  document.body.classList.remove('is-loading');
-  gsap.timeline()
-    .to('.pl-inner', { opacity: 0, y: -24, duration: 0.6, ease: 'power2.in' })
-    .to('#preloader', { yPercent: -100, duration: 1.25, ease: 'expo.inOut' }, '-=0.1')
-    .add(heroIntro(), '-=0.75')
-    .set('#preloader', { display: 'none' });
-}
-boot();
-</script>
-</body>
+    <script type="module" src="./main.js"></script>
+  </body>
 </html>
